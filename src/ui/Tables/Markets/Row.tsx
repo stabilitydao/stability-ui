@@ -173,7 +173,7 @@ const Row: React.FC<IProps> = ({ market }) => {
             setShowAll((prev) => !prev);
           }}
         >
-          <div className="flex items-center justify-center gap-2 w-full sticky top-0 left-1/2 -translate-x-1/2 max-w-[300px] md:max-w-full md:relative">
+          <div className="flex items-center justify-center gap-2 w-full sticky top-0 right-0 left-0 max-w-[300px] md:max-w-full md:relative">
             <p className="font-medium text-[14px] text-[#9180F4]">
               {showAll ? "Hide" : `Show all ${market?.reserves?.length}`}
             </p>
