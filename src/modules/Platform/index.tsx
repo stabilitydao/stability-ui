@@ -13,34 +13,31 @@ import { cn, formatNumber } from "@utils";
 import { apiData, marketPrices } from "@store";
 
 import {
-  AgentRole,
+  // AgentRole,
   type ApiMainReply,
-  getAgents,
-  seeds,
-  IBuilderAgent,
+  // seeds,
+  // IAgent,
 } from "@stabilitydao/stability";
 
-import { IOperatorAgent, Agent } from "@stabilitydao/stability/out/agents";
-
-import { NodeState } from "@stabilitydao/stability/out/api.types";
+// import { NodeState } from "@stabilitydao/stability/out/api.types";
 
 const Platform = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
   const $marketPrices = useStore(marketPrices);
 
-  const operatorAgents: IOperatorAgent = getAgents(
-    "OPERATOR" as AgentRole
-  ) as Agent[];
+  // const operatorAgents: IOperatorAgent = getAgents(
+  //   "OPERATOR" as AgentRole
+  // ) as IAgent[];
 
-  const builderAgents: IBuilderAgent = getAgents(
-    "BUILDER" as AgentRole
-  ) as Agent[];
+  // const builderAgents: IBuilderAgent = getAgents(
+  //   "BUILDER" as AgentRole
+  // ) as IAgent[];
 
-  const operatorAgent = operatorAgents[0];
-  const builderAgent = builderAgents[0];
+  // const operatorAgent = operatorAgents[0];
+  // const builderAgent = builderAgents[0];
 
-  const isAlert = $apiData?.network?.status == "Alert";
-  const isOk = $apiData?.network?.status == "OK";
+  // const isAlert = $apiData?.network?.status == "Alert";
+  // const isOk = $apiData?.network?.status == "OK";
 
   const stblPrice = $marketPrices?.STBL;
 
@@ -49,8 +46,8 @@ const Platform = (): JSX.Element => {
     0
   );
 
-  const lastMonthBurnRate =
-    builderAgent?.burnRate?.[builderAgent?.burnRate?.length - 1];
+  // const lastMonthBurnRate =
+  //   builderAgent?.burnRate?.[builderAgent?.burnRate?.length - 1];
 
   return (
     <div className="flex flex-col max-w-[1200px] w-full gap-[24px] pb-[100px]">
@@ -201,7 +198,7 @@ const Platform = (): JSX.Element => {
           </div>
         </div>
       </div>
-
+      {/* 
       <h2 className="text-[26px] font-bold">🤖 Agents</h2>
 
       <div className="flex gap-[24px] flex-wrap lg:flex-nowrap mb-5">
@@ -296,7 +293,7 @@ const Platform = (): JSX.Element => {
             />
           </div>
         </a>
-      </div>
+      </div> */}
 
       <h2 className="text-[26px] font-bold">📦 Library</h2>
 
