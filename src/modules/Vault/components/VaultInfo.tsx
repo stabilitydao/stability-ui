@@ -38,7 +38,7 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
   const $currentChainID = useStore(currentChainID);
 
   useEffect(() => {
-    if (vault) {
+    if (vault && vault?.created) {
       const date = getDate(Number(vault?.created));
 
       setHardWorkOnDeposit(vault?.hardWorkOnDeposit ? "Yes" : "No");

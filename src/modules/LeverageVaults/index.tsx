@@ -256,7 +256,19 @@ const LeverageVaults = (): JSX.Element => {
 
   const initVaults = async () => {
     if ($vaults && $isVaultsLoaded) {
-      const allVaults = Object.values($vaults[146]) || [];
+      const activeNetworksVaults: { [key: string]: TVault[] } = {};
+
+      activeNetworks.forEach((network) => {
+        if (network.active) {
+          const _vaults = $vaults?.[network.id]
+            ? Object.values($vaults?.[network.id])
+            : [];
+
+          activeNetworksVaults[network.id] = _vaults;
+        }
+      });
+
+      const allVaults = Object.values(activeNetworksVaults).flat();
 
       const vaults: TVault[] = allVaults
         .filter((vault) => vault?.leverageLending)
