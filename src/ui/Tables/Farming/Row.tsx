@@ -44,7 +44,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
       <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] lg:w-[25%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A] lg:border-r-0">
         <div className="flex items-center gap-2 md:gap-3">
           <div className="flex items-center justify-center">
-            {vault.assets.map((asset, index) => (
+            {vault?.assets?.map((asset, index) => (
               <img
                 src={asset?.logo}
                 alt={asset?.symbol}
@@ -56,12 +56,11 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
             ))}
           </div>
           <span className="font-semibold text-[16px] max-w-[100px] md:max-w-[80px] lg:max-w-[130px] truncate overflow-hidden whitespace-nowrap">
-            {vault.assetsSymbol}
+            {vault?.assetsSymbol}
           </span>
         </div>
-
         <div className="hidden xl:flex items-center justify-center gap-1">
-          {!vault.symbol.includes("PT-") && (
+          {!!vault.sonicPoints && (
             <div
               title="Sonic Activity Points"
               className="rounded-[4px] border border-[#48c05c] bg-[#192c1e] h-6 flex items-center justify-center"
@@ -72,11 +71,12 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
                   alt="sonic"
                   className="w-3 h-3 rounded-full"
                 />
-                <span className="text-[10px]">x{vault.sonicPoints}</span>
+                <span className="text-[10px]">x{vault?.sonicPoints}</span>
               </div>
             </div>
           )}
-          {SILO_POINTS[vault.address as keyof typeof SILO_POINTS] && (
+
+          {SILO_POINTS[vault?.address as keyof typeof SILO_POINTS] && (
             <div
               title="Silo Points per $ / day"
               className="rounded-[4px] border border-[#FFA500] bg-[#36280f] h-6 flex items-center justify-center"
@@ -94,7 +94,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
             </div>
           )}
 
-          {!!vault.ringsPoints && (
+          {!!vault?.ringsPoints && (
             <div
               title="Rings Points"
               className="rounded-[4px] border border-[#5E6AD2] bg-[#1C1E31] h-6 flex items-center justify-center"
