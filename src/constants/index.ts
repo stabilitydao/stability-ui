@@ -158,6 +158,16 @@ const SILO_POINTS = {
   "0x425f26609e2309b9ab72cbf95092834e33b29a8a": 9.25,
 };
 
+const ETHENA_POINTS = {
+  "0xebdbfbd2ce72faff90507279480003aa41e06de3": 5,
+};
+
+const ETHERFI_POINTS = {
+  "0xa183729d08ad27a26e32a7a1c47a87054bc73190": 3,
+  "0xdb0ae51782f402d507ee3c31d92cd18e226d331b": 3,
+  "0xab0087d6fbc877246a4ba33636f80e5dcbd5be01": 3,
+};
+
 const CHAINS = [
   {
     name: chains["146"].name,
@@ -486,4 +496,6 @@ export {
   SPACE_ID,
   SNAPSHOT_API,
   METAVAULT_USERS_TABLE,
+  ETHENA_POINTS,
+  ETHERFI_POINTS,
 };

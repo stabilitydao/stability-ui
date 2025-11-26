@@ -719,7 +719,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               liveAPR = (supplyAPR - borrowAPR - stSAPR) * leverage;
             }
           } else if (vault?.leverageLending && vault?.assets?.length === 1) {
-            const LLAssets = stabilityAPIData?.underlyings?.[146];
+            const LLAssets = stabilityAPIData?.underlyings?.[chainID];
 
             const assetAPRData =
               LLAssets?.[vault?.assets?.[0] as keyof typeof LLAssets];

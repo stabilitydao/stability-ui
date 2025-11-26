@@ -19,11 +19,16 @@ import {
 
 import { aprFilter, visible } from "@store";
 
-import { formatFromBigInt, formatNumber } from "@utils";
+import {
+  formatFromBigInt,
+  formatNumber,
+  getSpecificSymbol,
+  getTokenData,
+} from "@utils";
 
 import { CHAINS, STABILITY_AAVE_POOLS } from "@constants";
 
-import { seeds } from "@stabilitydao/stability";
+import { seeds, tokenlist } from "@stabilitydao/stability";
 
 import type { TAPRPeriod, TVault } from "@types";
 
@@ -41,6 +46,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
     shareBalance: 0,
     USDBalance: 0,
   });
+
   const [earnData, setEarnData] = useState({
     apr: "",
     apy: "",
@@ -106,6 +112,27 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
     [vault]
   );
 
+  const borrowAsset = useMemo(() => {
+    const specificSymbol = getSpecificSymbol(vault.strategySpecific);
+
+    const tokenMeta = tokenlist.tokens.find(
+      (t) => t.symbol === specificSymbol || specificSymbol.includes(t.symbol)
+    );
+
+    const tokenData = tokenMeta ? getTokenData(tokenMeta.address) : undefined;
+
+    const borrowAsset = tokenData
+      ? {
+          address: tokenData.address,
+          logo: tokenData.logoURI,
+          symbol: tokenData.symbol,
+          name: tokenData.name,
+        }
+      : undefined;
+
+    return borrowAsset;
+  }, [vault, tokenlist]);
+
   return (
     <div className="w-full rounded-lg bg-[#101012] border border-[#23252A]">
       <div
@@ -152,7 +179,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                 value={
                   <div className="flex items-center gap-2">
                     <div className="flex items-center">
-                      {vault.assets.map((asset, index) => (
+                      {vault?.assets.map((asset, index) => (
                         <img
                           key={asset?.address + index}
                           src={asset?.logo}
@@ -161,6 +188,18 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                           className="w-6 h-6 rounded-full"
                         />
                       ))}
+                      {!!borrowAsset && (
+                        <div className="flex items-center">
+                          <span>-</span>
+                          <img
+                            key={borrowAsset?.address}
+                            src={borrowAsset?.logo}
+                            alt={borrowAsset?.symbol}
+                            title={borrowAsset?.symbol}
+                            className="w-6 h-6 rounded-full"
+                          />
+                        </div>
+                      )}
                     </div>
                     {/*<p className="text-[16px] font-semibold">
                       {vault.assets[0].symbol}{" "}
