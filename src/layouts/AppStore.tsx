@@ -653,86 +653,81 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         let liveAPR: undefined | number = undefined;
         let assetAPR: undefined | number = undefined;
 
-        if (chainID === "146") {
-          // Points
-          switch (vault?.address?.toLowerCase()) {
-            case "0x4422117b942f4a87261c52348c36aefb0dcddb1a":
-              sonicPoints = 72;
-              break;
-            case "0x908db38302177901b10ffa74fa80adaeb0351ff1":
-              sonicPoints = 108;
-              ringsPoints = 18;
-              break;
-            case "0x46bc0f0073ff1a6281d401cdc6cd56cec0495047":
-              sonicPoints = 48;
-              ringsPoints = 9;
-              break;
-            default:
-              const scProportionIndex = assets.findIndex((asset) =>
-                ["scETH", "scUSD"].includes(asset?.symbol as string)
+        // Points
+        switch (vault?.address?.toLowerCase()) {
+          case "0x4422117b942f4a87261c52348c36aefb0dcddb1a":
+            sonicPoints = 72;
+            break;
+          case "0x908db38302177901b10ffa74fa80adaeb0351ff1":
+            sonicPoints = 108;
+            ringsPoints = 18;
+            break;
+          case "0x46bc0f0073ff1a6281d401cdc6cd56cec0495047":
+            sonicPoints = 48;
+            ringsPoints = 9;
+            break;
+          default:
+            const scProportionIndex = assets.findIndex((asset) =>
+              ["scETH", "scUSD"].includes(asset?.symbol as string)
+            );
+
+            let points = strategyAssets.reduce((acc, asset, index) => {
+              let whitelistAssetPoints =
+                (sonicWhitelistedAssets[
+                  asset as keyof typeof sonicWhitelistedAssets
+                ] ?? 0) * 2;
+              return (
+                acc +
+                ((assetsProportions?.[index] ?? 0) / 100) * whitelistAssetPoints
               );
+            }, 0);
 
-              let points = strategyAssets.reduce((acc, asset, index) => {
-                let whitelistAssetPoints =
-                  (sonicWhitelistedAssets[
-                    asset as keyof typeof sonicWhitelistedAssets
-                  ] ?? 0) * 2;
-                return (
-                  acc +
-                  ((assetsProportions?.[index] ?? 0) / 100) *
-                    whitelistAssetPoints
-                );
-              }, 0);
+            const pointsMultiplier = extractPointsMultiplier(strategySpecific);
 
-              const pointsMultiplier =
-                extractPointsMultiplier(strategySpecific);
+            if (pointsMultiplier) {
+              points *= pointsMultiplier;
+            }
 
-              if (pointsMultiplier) {
-                points *= pointsMultiplier;
-              }
+            if (scProportionIndex !== -1) {
+              const scProportion = assetsProportions?.[scProportionIndex] ?? 0;
 
-              if (scProportionIndex !== -1) {
-                const scProportion =
-                  assetsProportions?.[scProportionIndex] ?? 0;
+              ringsPoints = Number(((scProportion / 100) * 1.5).toFixed(2));
+            }
 
-                ringsPoints = Number(((scProportion / 100) * 1.5).toFixed(2));
-              }
+            sonicPoints = Number(points.toFixed(1));
+            break;
+        }
+        // Leverage lending live APR & asset APR
+        if (
+          vault?.address?.toLowerCase() ===
+          "0x2fbeba931563feaab73e8c66d7499c49c8ada224"
+        ) {
+          const stS = (stabilityAPIData?.underlyings?.[146] as any)?.[
+            "0xE5DA20F15420aD15DE0fa650600aFc998bbE3955"
+          ];
 
-              sonicPoints = Number(points.toFixed(1));
-              break;
+          if (stS) {
+            const supplyAPR = vault?.leverageLending?.supplyApr ?? 0;
+            const borrowAPR = vault?.leverageLending?.borrowApr ?? 0;
+            const leverage = vault?.leverageLending?.leverage ?? 0;
+            const stSAPR = stS?.apr?.daily ?? 0;
+
+            liveAPR = (supplyAPR - borrowAPR - stSAPR) * leverage;
           }
-          // Leverage lending live APR & asset APR
-          if (
-            vault?.address?.toLowerCase() ===
-            "0x2fbeba931563feaab73e8c66d7499c49c8ada224"
-          ) {
-            const stS = (stabilityAPIData?.underlyings?.[146] as any)?.[
-              "0xE5DA20F15420aD15DE0fa650600aFc998bbE3955"
-            ];
+        } else if (vault?.leverageLending && vault?.assets?.length === 1) {
+          const LLAssets = stabilityAPIData?.underlyings?.[chainID];
 
-            if (stS) {
-              const supplyAPR = vault?.leverageLending?.supplyApr ?? 0;
-              const borrowAPR = vault?.leverageLending?.borrowApr ?? 0;
-              const leverage = vault?.leverageLending?.leverage ?? 0;
-              const stSAPR = stS?.apr?.daily ?? 0;
+          const assetAPRData =
+            LLAssets?.[vault?.assets?.[0] as keyof typeof LLAssets];
 
-              liveAPR = (supplyAPR - borrowAPR - stSAPR) * leverage;
-            }
-          } else if (vault?.leverageLending && vault?.assets?.length === 1) {
-            const LLAssets = stabilityAPIData?.underlyings?.[chainID];
+          if (assetAPRData) {
+            const supplyAPR = vault?.leverageLending?.supplyApr ?? 0;
+            const borrowAPR = vault?.leverageLending?.borrowApr ?? 0;
+            const leverage = vault?.leverageLending?.leverage ?? 0;
+            const dailyAPR = assetAPRData?.apr?.daily ?? 0;
 
-            const assetAPRData =
-              LLAssets?.[vault?.assets?.[0] as keyof typeof LLAssets];
-
-            if (assetAPRData) {
-              const supplyAPR = vault?.leverageLending?.supplyApr ?? 0;
-              const borrowAPR = vault?.leverageLending?.borrowApr ?? 0;
-              const leverage = vault?.leverageLending?.leverage ?? 0;
-              const dailyAPR = assetAPRData?.apr?.daily ?? 0;
-
-              assetAPR = dailyAPR;
-              liveAPR = (dailyAPR + supplyAPR - borrowAPR) * leverage;
-            }
+            assetAPR = dailyAPR;
+            liveAPR = (dailyAPR + supplyAPR - borrowAPR) * leverage;
           }
         }
 
