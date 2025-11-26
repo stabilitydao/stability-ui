@@ -113,6 +113,8 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
   );
 
   const borrowAsset = useMemo(() => {
+    if (!vault?.leverageLending) return undefined;
+
     const specificSymbol = getSpecificSymbol(vault.strategySpecific);
 
     const tokenMeta = tokenlist.tokens.find(
