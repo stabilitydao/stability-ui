@@ -152,15 +152,15 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
 
         <a
           href={`/chains/${vaultChain?.id}`}
-          className="hidden md:flex items-center cursor-pointer gap-3"
+          className="flex items-center cursor-pointer gap-3"
         >
           <img
-            className="w-10 h-10 rounded-full"
+            className="w-6 h-6 md:w-10 md:h-10 rounded-full"
             src={vaultChain?.logoURI}
             alt={vaultChain?.name}
             title={vaultChain?.name}
           />
-          {vaultChain?.name}
+          <span className="hidden md:flex">{vaultChain?.name}</span>
         </a>
       </div>
 
