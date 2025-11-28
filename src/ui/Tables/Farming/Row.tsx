@@ -1,6 +1,6 @@
 import { formatNumber } from "@utils";
 
-import { SILO_POINTS } from "@constants";
+import { SILO_POINTS, CHAINS } from "@constants";
 //ETHENA_POINTS, ETHERFI_POINTS
 import { TVault, TAPRModal } from "@types";
 
@@ -41,6 +41,8 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
       ? `${vault.assetsSymbol}-${vault?.assets[1]?.symbol}`
       : vault?.assetsSymbol;
 
+  const chain = CHAINS.find(({ id }) => id === vault?.network);
+
   return (
     <a
       className="text-center bg-[#101012] cursor-pointer h-[56px] font-medium relative flex items-center border border-[#23252A] border-b-0 w-[762px] md:w-[960px] lg:w-full"
@@ -50,6 +52,12 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
       <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] lg:w-[25%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A] lg:border-r-0">
         <div className="flex items-center gap-2">
           <div className="flex items-center justify-center">
+            <img
+              src={chain?.logoURI}
+              alt={chain?.name}
+              title={chain?.name}
+              className="w-5 h-5 md:w-6 md:h-6 rounded-full mr-1"
+            />
             {vault?.assets?.map((asset, index) => (
               <img
                 src={asset?.logo}
@@ -61,7 +69,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
               />
             ))}
           </div>
-          <span className="font-semibold text-[14px] max-w-[100px] md:max-w-[80px] lg:max-w-[130px] truncate overflow-hidden whitespace-nowrap">
+          <span className="font-semibold text-[14px] max-w-[70px] md:max-w-[80px] lg:max-w-[130px] truncate overflow-hidden whitespace-nowrap">
             {symbol}
           </span>
         </div>

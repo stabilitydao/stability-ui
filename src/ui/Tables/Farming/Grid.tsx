@@ -2,6 +2,8 @@ import { RewardsCarousel } from "../../RewardsCarousel";
 
 import { formatNumber } from "@utils";
 
+import { CHAINS } from "@constants";
+
 import { TVault, VaultTypes } from "@types";
 
 interface IProps {
@@ -26,6 +28,8 @@ const Grid: React.FC<IProps> = ({ APRs, vault }) => {
 
   const lendingPlatform = vault.strategyInfo.protocols[0].name;
 
+  const chain = CHAINS.find(({ id }) => id === vault?.network);
+
   return (
     <a
       className="bg-[#101012] cursor-pointer font-medium relative border border-[#23252A] rounded-lg overflow-hidden"
@@ -35,6 +39,12 @@ const Grid: React.FC<IProps> = ({ APRs, vault }) => {
       <div className="p-6 flex flex-col gap-6">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center flex-shrink-0">
+            <img
+              src={chain?.logoURI}
+              alt={chain?.name}
+              title={chain?.name}
+              className="w-10 h-10 rounded-full mr-1"
+            />
             {vault.assets.map((asset, index) => (
               <img
                 src={asset?.logo}
