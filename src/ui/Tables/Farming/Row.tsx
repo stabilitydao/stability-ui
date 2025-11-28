@@ -1,7 +1,7 @@
 import { formatNumber } from "@utils";
 
 import { SILO_POINTS } from "@constants";
-
+//ETHENA_POINTS, ETHERFI_POINTS
 import { TVault, TAPRModal } from "@types";
 
 interface IProps {
@@ -35,6 +35,12 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
 
   const lendingPlatform = vault.strategyInfo.protocols[0].name;
 
+  // symbol with borrow
+  const symbol =
+    vault?.assets?.length > 1
+      ? `${vault.assetsSymbol}-${vault?.assets[1]?.symbol}`
+      : vault?.assetsSymbol;
+
   return (
     <a
       className="text-center bg-[#101012] cursor-pointer h-[56px] font-medium relative flex items-center border border-[#23252A] border-b-0 w-[762px] md:w-[960px] lg:w-full"
@@ -42,26 +48,25 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
       href={link}
     >
       <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] lg:w-[25%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A] lg:border-r-0">
-        <div className="flex items-center gap-2 md:gap-3">
+        <div className="flex items-center gap-2">
           <div className="flex items-center justify-center">
-            {vault.assets.map((asset, index) => (
+            {vault?.assets?.map((asset, index) => (
               <img
                 src={asset?.logo}
                 alt={asset?.symbol}
-                className={`w-5 h-5 md:w-8 md:h-8 rounded-full ${
+                className={`w-5 h-5 md:w-6 md:h-6 rounded-full ${
                   !index && vault.assets.length > 1 && "mr-[-8px] z-[5]"
                 }`}
                 key={asset?.logo + index}
               />
             ))}
           </div>
-          <span className="font-semibold text-[16px] max-w-[100px] md:max-w-[80px] lg:max-w-[130px] truncate overflow-hidden whitespace-nowrap">
-            {vault.assetsSymbol}
+          <span className="font-semibold text-[14px] max-w-[100px] md:max-w-[80px] lg:max-w-[130px] truncate overflow-hidden whitespace-nowrap">
+            {symbol}
           </span>
         </div>
-
         <div className="hidden xl:flex items-center justify-center gap-1">
-          {!vault.symbol.includes("PT-") && (
+          {!!vault.sonicPoints && (
             <div
               title="Sonic Activity Points"
               className="rounded-[4px] border border-[#48c05c] bg-[#192c1e] h-6 flex items-center justify-center"
@@ -72,11 +77,12 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
                   alt="sonic"
                   className="w-3 h-3 rounded-full"
                 />
-                <span className="text-[10px]">x{vault.sonicPoints}</span>
+                <span className="text-[10px]">x{vault?.sonicPoints}</span>
               </div>
             </div>
           )}
-          {SILO_POINTS[vault.address as keyof typeof SILO_POINTS] && (
+
+          {SILO_POINTS[vault?.address as keyof typeof SILO_POINTS] && (
             <div
               title="Silo Points per $ / day"
               className="rounded-[4px] border border-[#FFA500] bg-[#36280f] h-6 flex items-center justify-center"
@@ -94,7 +100,50 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
             </div>
           )}
 
-          {!!vault.ringsPoints && (
+          {/* {ETHENA_POINTS[vault?.address as keyof typeof ETHENA_POINTS] && (
+            <div
+              title="Ethena points"
+              className="rounded-[4px] border border-[#58595D] bg-[#35363B] h-6 flex items-center justify-center"
+            >
+              <div className="flex items-center gap-1 px-2">
+                <img
+                  src="/ethena.svg"
+                  alt="Ethena"
+                  className="w-3 h-3 rounded-full"
+                />
+                <span className="text-[10px]">
+                  x
+                  {ETHENA_POINTS[vault?.address as keyof typeof ETHENA_POINTS] *
+                    Number(vault?.leverage ?? 1)}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {ETHERFI_POINTS[vault?.address as keyof typeof ETHERFI_POINTS] && (
+            <div
+              title="Ether.fi loyalty points"
+              className="rounded-[4px] border border-[#58595D] bg-[#35363B] h-6 flex items-center justify-center"
+            >
+              <div className="flex items-center gap-1 px-2">
+                <img
+                  src="/ether.fi.svg"
+                  alt="Ether.fi"
+                  className="w-3 h-3 rounded-full"
+                />
+                <span className="text-[10px]">
+                  x
+                  {(
+                    ETHERFI_POINTS[
+                      vault?.address as keyof typeof ETHERFI_POINTS
+                    ] * Number(vault?.leverage ?? 1)
+                  ).toFixed()}
+                </span>
+              </div>
+            </div>
+          )} */}
+
+          {!!vault?.ringsPoints && (
             <div
               title="Rings Points"
               className="rounded-[4px] border border-[#5E6AD2] bg-[#1C1E31] h-6 flex items-center justify-center"

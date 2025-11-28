@@ -66,9 +66,7 @@ export const useMarketUsers = (market: TMarket): TResult => {
               market?.type
             ),
           }))
-          .filter(
-            (user) => Number(user.debt) > 0.01 && Number(user.collateral) > 0.01
-          );
+          .filter((user) => Number(user.debt) + Number(user.collateral) > 0.01);
 
         marketsUsers.setKey(marketId, users);
       }

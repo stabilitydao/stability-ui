@@ -43,6 +43,7 @@ import { getSortedTableStateFromUrl } from "./functions/getSortedTableStateFromU
 import { getAllowance } from "./functions/getAllowance";
 import { getBalance } from "./functions/getBalance";
 import { getGasLimit } from "./functions/getGasLimit";
+import { getSpecificSymbol } from "./functions/getSpecificSymbol";
 
 /* HOOKS */
 import { useClickOutside } from "./hooks/useClickOutside";
@@ -103,4 +104,5 @@ export {
   countVotes,
   useStakingData,
   getSortedTableStateFromUrl,
+  getSpecificSymbol,
 };
