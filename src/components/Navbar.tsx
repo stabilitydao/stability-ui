@@ -46,6 +46,8 @@ const Navbar = (): JSX.Element => {
       setActivePath("metavaults");
     } else if (currentPath.includes("lending")) {
       setActivePath("lending");
+    } else if (currentPath.includes("leverage-vaults")) {
+      setActivePath("leverage-vaults");
     } else if (isBasicPage) {
       setActivePath(currentPath);
     }

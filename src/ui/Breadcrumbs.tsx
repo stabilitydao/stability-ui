@@ -50,6 +50,16 @@ const Breadcrumbs = (): JSX.Element => {
       add("All Vaults", "vaults");
 
       add(symbol);
+    } else if (main === "leverage-vaults" && rest.length === 2) {
+      const [, chainId, vaultAddress] = currentPath.split("/");
+
+      const vault = $vaults?.[chainId]?.[vaultAddress?.toLowerCase()];
+
+      const symbol = vault?.symbol || "Vault";
+
+      add("Leverage Vaults", "leverage-vaults");
+
+      add(symbol);
     } else if (main === "strategies") {
       add("Platform", "platform");
       add("Strategies", "strategies");

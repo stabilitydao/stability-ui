@@ -4,8 +4,6 @@ import { useStore } from "@nanostores/react";
 
 import { TimeDifferenceIndicator } from "@ui";
 
-import { formatNumber } from "@utils";
-
 import { aprFilter } from "@store";
 
 import type { TAPRModal, TEarningData } from "@types";
@@ -31,11 +29,6 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
   const dailyAPRValue = (
     Number(state.earningData.apr[$aprFilter]) / 365
   ).toFixed(2);
-
-  const gemsAPR = formatNumber(
-    state.earningData.gemsAPR[$aprFilter],
-    "formatAPR"
-  );
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
@@ -121,10 +114,6 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
             <div className="flex items-center justify-between">
               <p className="text-[#97979A] font-medium">Daily yield</p>
               <p className="text-end font-semibold">{dailyAPRValue}%</p>
-            </div>
-            <div className="flex items-center justify-between">
-              <p className="text-[#97979A] font-medium">Gems APR</p>
-              <p className="text-end font-semibold"> {gemsAPR}%</p>
             </div>
           </div>
           <div className="flex items-center justify-between w-full">

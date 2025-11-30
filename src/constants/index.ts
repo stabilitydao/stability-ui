@@ -324,15 +324,7 @@ const PATHS = [
 ];
 
 const ROUTES = {
-  basic: [
-    "staking",
-    "dashboard",
-    "leverage-vaults",
-    "alm",
-    "agents",
-    "lending",
-    "dao",
-  ],
+  basic: ["staking", "dashboard", "alm", "agents", "lending", "dao"],
   platform: [
     "platform",
     "strategies",
