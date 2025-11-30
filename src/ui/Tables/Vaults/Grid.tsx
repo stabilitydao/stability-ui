@@ -27,10 +27,13 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
     rings: vault.ringsPoints,
   };
 
-  const link =
-    vault?.type === VaultTypes.Vault
-      ? `/vaults/${vault.network}/${vault.address}`
-      : `/metavaults/${vault.network}/${vault.address}`;
+  let link = `/metavaults/${vault.network}/${vault.address}`;
+
+  if (vault?.type === VaultTypes.Vault) {
+    link = !!vault?.leverageLending
+      ? `/leverage-vaults/${vault.network}/${vault.address}`
+      : `/vaults/${vault.network}/${vault.address}`;
+  }
 
   const modalData =
     vault?.type === VaultTypes.Vault
