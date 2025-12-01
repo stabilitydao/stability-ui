@@ -83,7 +83,7 @@ const Chart = ({ data }: { data: TPieChartData[] }) => {
         isAnimationActive={true}
         stroke="none"
       >
-        {data.map((obj: TPieChartData, index: number) => (
+        {data?.map((obj: TPieChartData, index: number) => (
           <Cell key={`cell-${index}`} fill={obj.color} />
         ))}
       </Pie>
@@ -106,7 +106,7 @@ const Assets: React.FC<IProps> = memo(
       config: wagmiConfig,
     });
 
-    const onCreationPrice: bigint[] = pricesOnCreation.map((price: string) =>
+    const onCreationPrice: bigint[] = pricesOnCreation?.map((price: string) =>
       BigInt(price)
     );
 
@@ -124,11 +124,11 @@ const Assets: React.FC<IProps> = memo(
 
       let isChart = false;
 
-      const tokens = assetsAmounts[0].map((token: TAddress) =>
+      const tokens = assetsAmounts[0]?.map((token: TAddress) =>
         getTokenData(token)
       );
 
-      const amounts = assetsAmounts[1].map((amount: bigint, index: number) =>
+      const amounts = assetsAmounts[1]?.map((amount: bigint, index: number) =>
         formatUnits(amount, tokens[index]?.decimals as number)
       );
 
@@ -139,7 +139,7 @@ const Assets: React.FC<IProps> = memo(
       //     return formatUnits(amount, tokens[index]?.decimals as number);
       // });
 
-      const amountsInUSD = amounts.map((amount: string, index: number) => {
+      const amountsInUSD = amounts?.map((amount: string, index: number) => {
         const tokenAddress: TAddress = tokens[index]?.address as TAddress;
 
         const tokenPrice: string = $assetsPrices[network][tokenAddress]?.price;
@@ -152,7 +152,7 @@ const Assets: React.FC<IProps> = memo(
         0
       );
 
-      const investedAssets = amountsInUSD.map(
+      const investedAssets = amountsInUSD?.map(
         (amount: number, index: number) => {
           const { address, symbol, logoURI, decimals } = tokens[
             index
@@ -204,6 +204,8 @@ const Assets: React.FC<IProps> = memo(
       );
     }, [$connected, connector, $currentChainID]);
 
+    if (!pricesOnCreation) return null;
+
     return (
       <div className="md:p-3 mt-5">
         <HeadingText text="Assets" scale={2} styles="text-left mb-3" />
@@ -214,7 +216,7 @@ const Assets: React.FC<IProps> = memo(
 
               <div className="flex flex-col items-center gap-5">
                 {investedData &&
-                  investedData.map((data: TPieChartData, index: number) => {
+                  investedData?.map((data: TPieChartData, index: number) => {
                     return (
                       <div
                         className="flex items-center gap-2"
@@ -240,7 +242,7 @@ const Assets: React.FC<IProps> = memo(
           )}
           <div className="flex flex-col md:flex-row w-full">
             {investedData &&
-              investedData.map((asset: TPieChartData, index: number) => {
+              investedData?.map((asset: TPieChartData, index: number) => {
                 const assetData: TToken | undefined = getTokenData(
                   asset.address
                 );
@@ -252,7 +254,9 @@ const Assets: React.FC<IProps> = memo(
                   assetData?.address as TAddress
                 );
 
-                const priceOnLaunch = formatUnits(onCreationPrice[index], 18);
+                const priceOnLaunch = onCreationPrice
+                  ? formatUnits(onCreationPrice?.[index], 18)
+                  : 0;
 
                 const price: number = $assetsPrices[network][asset?.address]
                   ? Number($assetsPrices[network][asset?.address]?.price)
@@ -365,7 +369,7 @@ const Assets: React.FC<IProps> = memo(
                         </div>
                         {assetData?.tags && (
                           <div className="flex items-center gap-2 flex-wrap">
-                            {assetData.tags.map(
+                            {assetData?.tags?.map(
                               (tag: string, index: number) => (
                                 <p
                                   className="text-[14px] px-2 py-1 rounded border bg-[#202A21] border-[#008B46] uppercase text-[#2BB656]"

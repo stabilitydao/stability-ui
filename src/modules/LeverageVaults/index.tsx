@@ -18,7 +18,7 @@ import { vaults, isVaultsLoaded, aprFilter, error } from "@store";
 
 import { initFilters } from "./functions";
 
-import { dataSorter, cn } from "@utils";
+import { dataSorter, cn, getSpecificSymbol, getTokenData } from "@utils";
 
 import {
   FARMING_TABLE_FILTERS,
@@ -37,6 +37,8 @@ import {
   DisplayTypes,
   VaultTypes,
 } from "@types";
+
+import { tokenlist } from "@stabilitydao/stability";
 
 const LeverageVaults = (): JSX.Element => {
   const $vaults = useStore(vaults);
@@ -256,7 +258,19 @@ const LeverageVaults = (): JSX.Element => {
 
   const initVaults = async () => {
     if ($vaults && $isVaultsLoaded) {
-      const allVaults = Object.values($vaults[146]) || [];
+      const activeNetworksVaults: { [key: string]: TVault[] } = {};
+
+      activeNetworks.forEach((network) => {
+        if (network.active) {
+          const _vaults = $vaults?.[network.id]
+            ? Object.values($vaults?.[network.id])
+            : [];
+
+          activeNetworksVaults[network.id] = _vaults;
+        }
+      });
+
+      const allVaults = Object.values(activeNetworksVaults).flat();
 
       const vaults: TVault[] = allVaults
         .filter((vault) => vault?.leverageLending)
@@ -265,12 +279,37 @@ const LeverageVaults = (): JSX.Element => {
           const tVault = vault as TVault;
 
           const leverage = Number(
-            (1 / (1 - vault?.leverageLending?.maxLtv / 100)).toFixed(1)
+            vault.leverageLending?.leverage?.toFixed(1) ?? 0
           );
+
+          const specificSymbol = getSpecificSymbol(vault.strategySpecific);
+
+          const tokenMeta = tokenlist.tokens.find(
+            (t) =>
+              t.symbol === specificSymbol || specificSymbol.includes(t.symbol)
+          );
+
+          const tokenData = tokenMeta
+            ? getTokenData(tokenMeta.address)
+            : undefined;
+
+          const borrowAsset = tokenData
+            ? {
+                address: tokenData.address,
+                logo: tokenData.logoURI,
+                symbol: tokenData.symbol,
+                name: tokenData.name,
+              }
+            : undefined;
+
+          const assets = borrowAsset
+            ? [...vault.assets, borrowAsset]
+            : vault.assets;
 
           return {
             ...tVault,
             leverage,
+            assets,
           };
         });
 

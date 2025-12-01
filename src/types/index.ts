@@ -164,7 +164,7 @@ type TBalances = {
 
 type TAsset = {
   address: TAddress;
-  color: string;
+  color?: string;
   logo: string;
   name: string;
   symbol: string;

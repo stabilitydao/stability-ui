@@ -43,10 +43,12 @@ const Breadcrumbs = (): JSX.Element => {
     } else if (main === "vaults" && rest.length === 2) {
       const [, chainId, vaultAddress] = currentPath.split("/");
 
-      const symbol =
-        $vaults?.[chainId]?.[vaultAddress?.toLowerCase()]?.symbol || "Vault";
+      const vault = $vaults?.[chainId]?.[vaultAddress?.toLowerCase()];
+
+      const symbol = vault?.symbol || "Vault";
 
       add("All Vaults", "vaults");
+
       add(symbol);
     } else if (main === "strategies") {
       add("Platform", "platform");
