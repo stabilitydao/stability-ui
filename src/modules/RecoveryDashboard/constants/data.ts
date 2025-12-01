@@ -1,3 +1,6 @@
+// src/modules/RecoveryDashboard/constants/data.ts
+import { DashboardCardData } from "../types";
+
 export const tokenData = [
   {
     name: "Recovery Stability USD",
@@ -88,13 +91,14 @@ export const poolData = [
   },
 ];
 
-export const dashboardData = [
+export const dashboardData: DashboardCardData[] = [
   {
     title: "Total Tokens",
     value: tokenData.length,
     subtitle: "Recovery tokens",
     change: null,
     changeType: null,
+    specialType: null,
   },
   {
     title: "Average Burn Rate",
@@ -102,6 +106,7 @@ export const dashboardData = [
     subtitle: null,
     change: null,
     changeType: null,
+    specialType: "averageBurnRate",
   },
   {
     title: "Total Pools",
@@ -109,6 +114,7 @@ export const dashboardData = [
     subtitle: "Recovery pools",
     change: null,
     changeType: null,
+    specialType: null,
   },
   {
     title: "Total Value Locked",
@@ -116,5 +122,6 @@ export const dashboardData = [
     subtitle: null,
     change: "-12.3% from last month",
     changeType: "negative",
+    specialType: null,
   },
 ];

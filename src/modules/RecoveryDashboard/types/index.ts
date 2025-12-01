@@ -9,10 +9,11 @@ export type SortDirection = "asc" | "desc" | null;
 
 export interface DashboardCardData {
   title: string;
-  value: string;
+  value: string | number | null;
   subtitle?: string | null;
   change?: string | null;
   changeType?: string | null;
+  specialType?: string | null;
 }
 
 export interface Token {
