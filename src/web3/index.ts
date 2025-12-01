@@ -27,6 +27,7 @@ import AavePoolABI from "./abi/AavePoolABI.ts";
 import AaveProtocolDataProviderABI from "./abi/AaveProtocolDataProviderABI.ts";
 import StabilityDAOABI from "./abi/StabilityDAOABI.ts";
 import VestingABI from "./abi/VestingABI.ts";
+import RamsesV3PoolABI from "./abi/RamsesV3PoolABI.ts";
 
 import type { TAddress } from "@types";
 
@@ -160,4 +161,5 @@ export {
   AaveProtocolDataProviderABI,
   StabilityDAOABI,
   VestingABI,
+  RamsesV3PoolABI,
 };
