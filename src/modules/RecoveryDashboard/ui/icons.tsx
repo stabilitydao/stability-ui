@@ -10,7 +10,7 @@ interface IProps {
 
 const DEFAULT_SIZE = "100%";
 
-export const CopyIcon = ({ height, width }: IProps) => (
+export const CopyIcon = ({ height, width }: IProps): JSX.Element => (
   <svg
     width={width ?? DEFAULT_SIZE}
     height={height ?? DEFAULT_SIZE}
@@ -27,7 +27,7 @@ export const CopyIcon = ({ height, width }: IProps) => (
   </svg>
 );
 
-export const CheckmarkIcon = ({ height, width }: IProps) => (
+export const CheckmarkIcon = ({ height, width }: IProps): JSX.Element => (
   <svg
     width={width ?? DEFAULT_SIZE}
     height={height ?? DEFAULT_SIZE}
@@ -43,7 +43,7 @@ export const CheckmarkIcon = ({ height, width }: IProps) => (
   </svg>
 );
 
-export const SearchIcon = ({ height, width, className }: IProps) => (
+export const SearchIcon = ({ height, width, className }: IProps): JSX.Element => (
   <svg
     className={className}
     width={width ?? DEFAULT_SIZE}
@@ -61,7 +61,7 @@ export const SearchIcon = ({ height, width, className }: IProps) => (
   </svg>
 );
 
-export const ExternalLinkIcon = ({ height, width }: IProps) => (
+export const ExternalLinkIcon = ({ height, width }: IProps): JSX.Element => (
   <svg
     className="w-4 h-4"
     width={width ?? DEFAULT_SIZE}
@@ -79,7 +79,7 @@ export const ExternalLinkIcon = ({ height, width }: IProps) => (
   </svg>
 );
 
-export const BackwardIcon = ({ height, width, className }: IProps) => (
+export const BackwardIcon = ({ height, width, className }: IProps): JSX.Element => (
   <svg
     className={className}
     width={width ?? DEFAULT_SIZE}
@@ -94,7 +94,7 @@ export const BackwardIcon = ({ height, width, className }: IProps) => (
   </svg>
 );
 
-export const ForwardIcon = ({ height, width, className }: IProps) => (
+export const ForwardIcon = ({ height, width, className }: IProps): JSX.Element => (
   <svg
     className={className}
     width={width ?? DEFAULT_SIZE}
@@ -109,7 +109,7 @@ export const ForwardIcon = ({ height, width, className }: IProps) => (
   </svg>
 );
 
-export const SortArrowIcon = ({ height, width, className }: IProps) => (
+export const SortArrowIcon = ({ height, width, className }: IProps): JSX.Element => (
   <svg
     className={className}
     width={width ?? DEFAULT_SIZE}

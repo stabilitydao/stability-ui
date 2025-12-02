@@ -1,11 +1,4 @@
-export type SortField =
-  | "token"
-  | "burnProgress"
-  | "vault"
-  | "pair"
-  | "price"
-  | null;
-export type SortDirection = "asc" | "desc" | null;
+import { Address } from "viem";
 
 export interface DashboardCardData {
   title: string;
@@ -16,18 +9,23 @@ export interface DashboardCardData {
   specialType?: string | null;
 }
 
-export interface Token {
-  id: number;
-  token: string;
-  tokenAddress: string;
-  burnStatus: string;
-  burnProgress: number;
-}
+export type GetPriceReturn = {
+  price_token1_per_token0: number;
+  price_token0_per_token1: number;
+  sym0: string;
+  sym1: string;
+};
 
-export interface Pool {
-  id: number;
-  vault: string;
-  pair: string;
-  tokenAddress: string;
-  price: number;
-}
+export type PriceCache = Record<string, GetPriceReturn>;
+
+export type Token = {
+  name: string;
+  symbol: string;
+  address: Address;
+  initialSupply: bigint;
+  decimals: number;
+};
+
+export type PriceCellProps = {
+  price?: GetPriceReturn | null;
+};

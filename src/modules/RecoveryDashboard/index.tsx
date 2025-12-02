@@ -15,36 +15,14 @@ import {
 import { FullPageLoader } from "./ui/FullPageLoader";
 import { wagmiConfig, RamsesV3PoolABI } from "@web3";
 import { DashboardGrid } from "./components/Dashboard";
+import { GetPriceReturn, PriceCache, Token, PriceCellProps } from "./types";
 
 /* ----------------------------- Utilities ----------------------------- */
 
 const truncateAddress = (address: string) =>
   `${address.slice(0, 6)}...${address.slice(-4)}`;
 
-/* ---------------------------- Types / Models -------------------------- */
-
-type GetPriceReturn = {
-  price_token1_per_token0: number;
-  price_token0_per_token1: number;
-  sym0: string;
-  sym1: string;
-};
-
-type PriceCache = Record<string, GetPriceReturn>;
-
-type Token = {
-  name: string;
-  symbol: string;
-  address: Address;
-  initialSupply: bigint;
-  decimals: number;
-};
-
 /* ----------------------------- PriceCell ----------------------------- */
-
-type PriceCellProps = {
-  price?: GetPriceReturn | null;
-};
 
 const PriceCell: React.FC<PriceCellProps> = ({ price }) => {
   if (!price) {
@@ -52,24 +30,15 @@ const PriceCell: React.FC<PriceCellProps> = ({ price }) => {
   }
 
   return (
-    <div className="text-[#EAECEF] font-medium text-sm whitespace-nowrap flex flex-col">
-      <span>
-        1 {price.sym0} ={" "}
+    <div className="min-w-0">
+      <span className="text-[#EAECEF] font-medium text-sm text-balance leading-tight break-words">
+        1 {price.sym0} = {" "}
         {price.price_token1_per_token0.toLocaleString("en-US", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 4,
-        })}{" "}
+        })} {" "}
         {price.sym1}
       </span>
-
-      {/* <span>
-        1 {price.sym1} ={" "}
-        {price.price_token0_per_token1.toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 4,
-        })}{" "}
-        {price.sym0}
-      </span> */}
     </div>
   );
 };
@@ -389,25 +358,18 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
                   <div className="min-w-[600px]">
                     <div
                       className="grid gap-4 px-6 py-3 bg-[#151618] border-b border-[#23252A] text-[#97979A] text-sm font-semibold"
-                      style={{
-                        gridTemplateColumns: "clamp(60px, 15vw, 250px) 1fr 2fr",
-                      }}
+                      style={{ gridTemplateColumns: "clamp(60px, 15vw, 250px) 1fr 2fr" }}
                     >
-                      {["Token", "Token Address", "Recovery Progress"].map(
-                        (item) => (
-                          <div key={item}>{item}</div>
-                        )
-                      )}
+                      {["Token", "Token Address", "Recovery Progress"].map((item) => (
+                        <div key={item}>{item}</div>
+                      ))}
                     </div>
 
                     {tokenData.map((token) => (
                       <div
                         key={token.name}
                         className="grid gap-4 px-6 h-16 border-b border-[#23252A] last:border-b-0 items-center"
-                        style={{
-                          gridTemplateColumns:
-                            "clamp(60px, 15vw, 250px) 1fr 2fr",
-                        }}
+                        style={{ gridTemplateColumns: "clamp(60px, 15vw, 250px) 1fr 2fr" }}
                       >
                         <a
                           className="text-white truncate font-semibold text-sm"
@@ -422,16 +384,10 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
                           </span>
 
                           <button
-                            onClick={() =>
-                              handleCopyAddress(token.address, token.address)
-                            }
+                            onClick={() => handleCopyAddress(token.address, token.address)}
                             className="h-6 w-6 flex items-center justify-center"
                           >
-                            {copiedId === token.address ? (
-                              <CheckmarkIcon />
-                            ) : (
-                              <CopyIcon />
-                            )}
+                            {copiedId === token.address ? (<CheckmarkIcon />) : (<CopyIcon />)}
                           </button>
                         </div>
 
@@ -443,17 +399,13 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
                             <div className="w-full bg-[#23252A] rounded-full h-2">
                               <div
                                 className="bg-[#7C3BED] h-2 rounded-full transition-all duration-300"
-                                style={{
-                                  width: `${tokenBurnProgress[token.address] ?? 0
-                                    }%`,
-                                }}
+                                style={{ width: `${tokenBurnProgress[token.address] ?? 0}%` }}
                               />
                             </div>
                           </div>
 
                           <span className="text-[#97979A] font-semibold text-sm min-w-[50px] text-right">
-                            {(tokenBurnProgress[token.address] ?? 0).toFixed(2)}
-                            %
+                            {(tokenBurnProgress[token.address] ?? 0).toFixed(2)} %
                           </span>
                         </div>
                       </div>
@@ -490,10 +442,7 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
                   <div className="min-w-[600px]">
                     <div
                       className="grid gap-8 px-6 py-3 bg-[#151618] border-b border-[#23252A] text-[#9798A4] text-sm font-medium"
-                      style={{
-                        gridTemplateColumns:
-                          "clamp(60px, 23vw, 320px) clamp(150px, 43vw, 600px) 1fr",
-                      }}
+                      style={{ gridTemplateColumns: "clamp(60px, 23vw, 320px) clamp(150px, 43vw, 600px) 1fr" }}
                     >
                       {["Pair", "Pool Address", "Price"].map((item) => (
                         <div key={item}>{item}</div>
@@ -504,11 +453,8 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
                       currentPools.map((pool) => (
                         <div
                           key={pool.name}
-                          className="grid gap-8 px-6 py-4 border-b border-[#23252A]"
-                          style={{
-                            gridTemplateColumns:
-                              "clamp(60px, 23vw, 320px) clamp(150px, 43vw, 600px) 1fr",
-                          }}
+                          className="grid gap-8 px-6 py-4 border-b border-[#23252A] items-center"
+                          style={{ gridTemplateColumns: "clamp(60px, 23vw, 320px) clamp(150px, 43vw, 600px) 1fr" }}
                         >
                           <a
                             className="text-white truncate font-semibold text-sm"
@@ -523,16 +469,10 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
                             </span>
 
                             <button
-                              onClick={() =>
-                                handleCopyAddress(pool.address, pool.address)
-                              }
+                              onClick={() => handleCopyAddress(pool.address, pool.address)}
                               className="h-6 w-6 flex items-center justify-center"
                             >
-                              {copiedId === pool.address ? (
-                                <CheckmarkIcon />
-                              ) : (
-                                <CopyIcon />
-                              )}
+                              {copiedId === pool.address ? (<CheckmarkIcon />) : (<CopyIcon />)}
                             </button>
 
                             <button
@@ -543,7 +483,9 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
                             </button>
                           </div>
 
-                          <PriceCell price={priceCache[pool.address]} />
+                          <div className="min-w-0">
+                            <PriceCell price={priceCache[pool.address]} />
+                          </div>
                         </div>
                       ))
                     ) : (
@@ -585,9 +527,7 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
                     <div className="flex items-center gap-2">
                       <div className="hidden md:flex items-center gap-2">
                         <button
-                          onClick={() =>
-                            setCurrentPage((prev) => Math.max(prev - 1, 1))
-                          }
+                          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                           disabled={currentPage === 1}
                           className="px-3 text-white disabled:text-[#97979A]"
                         >
@@ -599,11 +539,7 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
                         </span>
 
                         <button
-                          onClick={() =>
-                            setCurrentPage((prev) =>
-                              Math.min(prev + 1, totalPages)
-                            )
-                          }
+                          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                           disabled={currentPage === totalPages}
                           className="px-3 text-white disabled:text-[#97979A]"
                         >
@@ -613,9 +549,7 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
 
                       <div className="flex items-center gap-4 md:hidden">
                         <button
-                          onClick={() =>
-                            setCurrentPage((prev) => Math.max(prev - 1, 1))
-                          }
+                          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                           disabled={currentPage === 1}
                           className="border-r border-l border-[#23252a] py-3 px-4 text-white disabled:text-[#97979A]"
                         >
@@ -623,11 +557,7 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
                         </button>
 
                         <button
-                          onClick={() =>
-                            setCurrentPage((prev) =>
-                              Math.min(prev + 1, totalPages)
-                            )
-                          }
+                          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                           disabled={currentPage === totalPages}
                           className="py-3 pr-4 text-white disabled:text-[#97979A]"
                         >

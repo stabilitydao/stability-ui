@@ -52,42 +52,36 @@ export const poolData = [
     url: "https://www.shadow.so/liquidity/manage/0x1e2edba99efd08578460bd9a66f4f521ec861eb9",
     pair: "RECmetaUSD/wmetaUSD",
     address: "0x1e2edBa99efd08578460BD9A66f4f521EC861eb9" as `0x${string}`,
-    price: 2345.67,
   },
   {
     name: "Shadow RECwmetaUSD/wmetaUSD",
     url: "https://www.shadow.so/liquidity/manage/0xd473a0f23f61f63f4e736b16f6133317f0ae4c0a",
     pair: "RECwmetaUSD/wmetaUSD",
     address: "0xd473A0F23f61F63F4e736b16f6133317F0ae4c0a" as `0x${string}`,
-    price: 2345.67,
   },
   {
     name: "Shadow RECwmetaUSDC/wmetaUSD",
     url: "https://www.shadow.so/liquidity/manage/0x41fc91524e97678f81362f3703b16b07ace0ae23",
     pair: "RECwmetaUSDC/wmetaUSD",
     address: "0x41FC91524E97678F81362f3703B16b07Ace0ae23" as `0x${string}`,
-    price: 2345.67,
   },
   {
     name: "Shadow RECwmetascUSD/wmetaUSD",
     url: "https://www.shadow.so/liquidity/manage/0x64c52e6c35c77150b58dc947672c4da606528f85",
     pair: "RECwmetascUSD/wmetaUSD",
     address: "0x64c52E6C35C77150B58DC947672c4dA606528F85" as `0x${string}`,
-    price: 2345.67,
   },
   {
     name: "Shadow RECmetaS/wmetaS",
     url: "https://www.shadow.so/liquidity/manage/0xb7b6a318621eb0fda0893549ea4ee5da4cecf19e",
     pair: "RECmetaS/wmetaS",
     address: "0xB7B6A318621eb0FDA0893549Ea4eE5DA4CecF19E" as `0x${string}`,
-    price: 2345.67,
   },
   {
     name: "Shadow RECwmetaS/wmetaS",
     url: "https://www.shadow.so/liquidity/manage/0xc68fac41bfc940fb5126ba1e790456ae273de9e7",
     pair: "RECwmetaS/wmetaS",
     address: "0xc68FaC41Bfc940FB5126Ba1E790456ae273de9E7" as `0x${string}`,
-    price: 2345.67,
   },
 ];
 
@@ -114,14 +108,6 @@ export const dashboardData: DashboardCardData[] = [
     subtitle: "Recovery pools",
     change: null,
     changeType: null,
-    specialType: null,
-  },
-  {
-    title: "Total Value Locked",
-    value: "$3.42M", // 3421290.8208
-    subtitle: null,
-    change: "-12.3% from last month",
-    changeType: "negative",
     specialType: null,
   },
 ];
