@@ -5,43 +5,22 @@ import { erc20Abi, Address } from "viem";
 import { readContract } from "@wagmi/core";
 import { dashboardData, poolData, tokenData } from "./constants/data";
 import {
-  BackwardIcon,
   CheckmarkIcon,
   CopyIcon,
   ExternalLinkIcon,
-  ForwardIcon,
   SearchIcon,
 } from "./ui/icons";
 import { FullPageLoader } from "./ui/FullPageLoader";
 import { wagmiConfig, RamsesV3PoolABI } from "@web3";
 import { DashboardGrid } from "./components/Dashboard";
-import { GetPriceReturn, PriceCache, Token, PriceCellProps } from "./types";
+import { GetPriceReturn, PriceCache, Token } from "./types";
+import { PriceCell } from "./components/PriceCell";
+import { TablePagination } from "./components/TablePagination";
 
 /* ----------------------------- Utilities ----------------------------- */
 
 const truncateAddress = (address: string) =>
   `${address.slice(0, 6)}...${address.slice(-4)}`;
-
-/* ----------------------------- PriceCell ----------------------------- */
-
-const PriceCell: React.FC<PriceCellProps> = ({ price }) => {
-  if (!price) {
-    return <div className="text-[#97979A] text-sm">—</div>;
-  }
-
-  return (
-    <div className="min-w-0">
-      <span className="text-[#EAECEF] font-medium text-sm text-balance leading-tight break-words">
-        1 {price.sym0} = {" "}
-        {price.price_token1_per_token0.toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 4,
-        })} {" "}
-        {price.sym1}
-      </span>
-    </div>
-  );
-};
 
 /* -------------------------- RecoveryDashboard ------------------------- */
 
@@ -300,14 +279,6 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
     []
   );
 
-  const handleItemsPerPageChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setItemsPerPage(Number(e.target.value));
-      setCurrentPage(1);
-    },
-    []
-  );
-
   const getBurnStatus = useCallback(
     (address: Address) => {
       const progress = tokenBurnProgress[address] ?? 0;
@@ -500,72 +471,16 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
 
                 {/* Pagination */}
                 {filteredPools.length > 0 && (
-                  <div className="flex items-center justify-between text-sm md:px-6 bg-[#151618] border-t border-[#23252A]">
-                    <div className="flex items-center gap-2">
-                      <div className="hidden md:flex items-center gap-2 py-3">
-                        <span className="text-[#97979A]">Items per page:</span>
-                        <select
-                          value={itemsPerPage}
-                          onChange={handleItemsPerPageChange}
-                          className="text-white bg-[#151618]"
-                        >
-                          <option value={5}>5</option>
-                          <option value={10}>10</option>
-                          <option value={15}>15</option>
-                          <option value={20}>20</option>
-                          <option value={30}>30</option>
-                        </select>
-                      </div>
-
-                      <span className="text-[#97979A] border-r md:border-l border-[#23252a] px-4 py-3">
-                        {startIndex + 1}-
-                        {Math.min(endIndex, filteredPools.length)} of{" "}
-                        {filteredPools.length} items
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <div className="hidden md:flex items-center gap-2">
-                        <button
-                          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                          disabled={currentPage === 1}
-                          className="px-3 text-white disabled:text-[#97979A]"
-                        >
-                          &lt; Previous
-                        </button>
-
-                        <span className="text-[#97979A]">
-                          {currentPage} of {totalPages} pages
-                        </span>
-
-                        <button
-                          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                          disabled={currentPage === totalPages}
-                          className="px-3 text-white disabled:text-[#97979A]"
-                        >
-                          Next &gt;
-                        </button>
-                      </div>
-
-                      <div className="flex items-center gap-4 md:hidden">
-                        <button
-                          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                          disabled={currentPage === 1}
-                          className="border-r border-l border-[#23252a] py-3 px-4 text-white disabled:text-[#97979A]"
-                        >
-                          <BackwardIcon className="w-4 h-4 rotate-90" />
-                        </button>
-
-                        <button
-                          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                          disabled={currentPage === totalPages}
-                          className="py-3 pr-4 text-white disabled:text-[#97979A]"
-                        >
-                          <ForwardIcon className="w-4 h-4 rotate-270" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <TablePagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    itemsPerPage={itemsPerPage}
+                    totalItems={filteredPools.length}
+                    startIndex={startIndex}
+                    endIndex={endIndex}
+                    onPageChange={setCurrentPage}
+                    onItemsPerPageChange={setItemsPerPage}
+                  />
                 )}
               </div>
             </section>
