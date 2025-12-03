@@ -29,6 +29,7 @@ import { StabilityBuilder, StabilityOperator } from "./Platform";
 import { DAO } from "./DAO";
 
 import { Season1, Season2 } from "./Seasons";
+import { RecoveryDashboard } from "./RecoveryDashboard";
 
 export {
   Factory,
@@ -63,4 +64,5 @@ export {
   DAO,
   Season1,
   Season2,
+  RecoveryDashboard,
 };
