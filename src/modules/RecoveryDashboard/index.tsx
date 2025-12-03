@@ -5,7 +5,7 @@ import { erc20Abi, Address } from "viem";
 import { readContract } from "@wagmi/core";
 import { dashboardData, tokenColumns, tokenData, poolColumns, poolData } from "./constants/data";
 import { CheckmarkIcon, CopyIcon, ExternalLinkIcon, SearchIcon } from "./ui/icons";
-import { FullPageLoader } from "./ui/FullPageLoader";
+import { FullPageLoader } from "@ui";
 import { wagmiConfig, RamsesV3PoolABI } from "@web3";
 import { DashboardGrid } from "./components/Dashboard";
 import { GetPriceReturn, PriceCache, Token } from "./types";
