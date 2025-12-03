@@ -29,3 +29,9 @@ export type Token = {
 export type PriceCellProps = {
   price?: GetPriceReturn | null;
 };
+
+export interface Column {
+  label: string;
+  sortable: boolean;
+  onSort?: () => void;
+}

@@ -3,13 +3,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { erc20Abi, Address } from "viem";
 import { readContract } from "@wagmi/core";
-import { dashboardData, poolData, tokenData } from "./constants/data";
-import {
-  CheckmarkIcon,
-  CopyIcon,
-  ExternalLinkIcon,
-  SearchIcon,
-} from "./ui/icons";
+import { dashboardData, tokenColumns, tokenData, poolColumns, poolData } from "./constants/data";
+import { CheckmarkIcon, CopyIcon, ExternalLinkIcon, SearchIcon } from "./ui/icons";
 import { FullPageLoader } from "./ui/FullPageLoader";
 import { wagmiConfig, RamsesV3PoolABI } from "@web3";
 import { DashboardGrid } from "./components/Dashboard";
@@ -331,8 +326,8 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
                       className="grid gap-4 px-6 py-3 bg-[#151618] border-b border-[#23252A] text-[#97979A] text-sm font-semibold"
                       style={{ gridTemplateColumns: "clamp(60px, 15vw, 250px) 1fr 2fr" }}
                     >
-                      {["Token", "Token Address", "Recovery Progress"].map((item) => (
-                        <div key={item}>{item}</div>
+                      {tokenColumns.map((column) => (
+                        <div key={column.label}>{column.label}</div>
                       ))}
                     </div>
 
@@ -415,8 +410,8 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
                       className="grid gap-8 px-6 py-3 bg-[#151618] border-b border-[#23252A] text-[#9798A4] text-sm font-medium"
                       style={{ gridTemplateColumns: "clamp(60px, 23vw, 320px) clamp(150px, 43vw, 600px) 1fr" }}
                     >
-                      {["Pair", "Pool Address", "Price"].map((item) => (
-                        <div key={item}>{item}</div>
+                      {poolColumns.map((column) => (
+                        <div key={column.label}>{column.label}</div>
                       ))}
                     </div>
 

@@ -1,5 +1,11 @@
 // src/modules/RecoveryDashboard/constants/data.ts
-import { DashboardCardData } from "../types";
+import { Column, DashboardCardData } from "../types";
+
+export const tokenColumns: Column[] = [
+  { label: "Token", sortable: true },
+  { label: "Token Address", sortable: false },
+  { label: "Recovery Progress", sortable: true },
+];
 
 export const tokenData = [
   {
@@ -46,6 +52,12 @@ export const tokenData = [
   },
 ];
 
+export const poolColumns: Column[] = [
+  { label: "Pair", sortable: true },
+  { label: "Pool Address", sortable: false },
+  { label: "Price", sortable: true },
+];
+
 export const poolData = [
   {
     name: "Shadow RECmetaUSD/wmetaUSD",
@@ -90,24 +102,18 @@ export const dashboardData: DashboardCardData[] = [
     title: "Total Tokens",
     value: tokenData.length,
     subtitle: "Recovery tokens",
-    change: null,
-    changeType: null,
     specialType: null,
   },
   {
     title: "Average Burn Rate",
     value: null,
     subtitle: null,
-    change: null,
-    changeType: null,
     specialType: "averageBurnRate",
   },
   {
     title: "Total Pools",
     value: poolData.length,
     subtitle: "Recovery pools",
-    change: null,
-    changeType: null,
     specialType: null,
   },
 ];
