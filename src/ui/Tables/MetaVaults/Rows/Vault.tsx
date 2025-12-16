@@ -7,6 +7,7 @@ import {
   TimeDifferenceIndicator,
   StrategyBadge,
   ArrowRightIcon,
+  QuestionIcon,
 } from "@ui";
 
 import { cn, formatNumber, useWindowWidth } from "@utils";
@@ -50,7 +51,8 @@ const Vault: React.FC<IProps> = ({
 
   const symbol =
     vault.type === VaultTypes.Vault
-      ? VAULTS_WITH_NAME[vault.address] || vault.assetsSymbol
+      ? VAULTS_WITH_NAME?.[vault?.address as keyof typeof VAULTS_WITH_NAME] ||
+        vault.assetsSymbol
       : vault.symbol;
 
   const isDimmed =
@@ -271,13 +273,7 @@ const Vault: React.FC<IProps> = ({
                   </p>
                 )}
               </div>
-              {vault.type === VaultTypes.Vault && (
-                <img
-                  src="/icons/circle_question.png"
-                  alt="Question icon"
-                  className="w-3 h-3"
-                />
-              )}
+              {vault.type === VaultTypes.Vault && <QuestionIcon />}
             </div>
           </Tippy>
         </div>

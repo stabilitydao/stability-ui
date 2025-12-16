@@ -1,5 +1,7 @@
 import Tippy from "@tippyjs/react";
 
+import { QuestionIcon } from "./Icons";
+
 import { cn } from "@utils";
 
 import "tippy.js/dist/tippy.css";
@@ -34,11 +36,7 @@ const CustomTooltip: React.FC<IProps> = ({
         >
           {name}
         </span>
-        <img
-          src="/icons/circle_question.png"
-          alt="Question icon"
-          className="w-4 h-4"
-        />
+        <QuestionIcon />
       </div>
     </Tippy>
   );

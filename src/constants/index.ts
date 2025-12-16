@@ -176,7 +176,7 @@ const CHAINS = [
     explorer: "https://etherscan.io",
     nativeCurrency: "ETH",
     color: "#FFFFFF",
-    active: true,
+    active: false,
   },
   {
     name: chains["146"].name,

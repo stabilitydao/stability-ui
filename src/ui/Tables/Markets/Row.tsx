@@ -4,9 +4,11 @@ import Tippy from "@tippyjs/react";
 
 import { UtilizationTooltip } from "./UtilizationTooltip";
 
-import { ProgressCircle, Badge } from "@ui";
+import { ProgressCircle, QuestionIcon } from "@ui";
 
 import { cn, formatNumber, getTokenData, useWindowWidth } from "@utils";
+
+import { integrations } from "@stabilitydao/stability";
 
 import { MarketTypes, TMarket, TMarketReserve } from "@types";
 
@@ -21,6 +23,8 @@ const Row: React.FC<IProps> = ({ market }) => {
   const windowWidth = useWindowWidth();
 
   const [showAll, setShowAll] = useState(false);
+
+  const operator = integrations?.[market?.operator?.toLowerCase()];
 
   return (
     <a
@@ -49,23 +53,51 @@ const Row: React.FC<IProps> = ({ market }) => {
               isHidden && "hidden"
             )}
           >
-            <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] md:w-[20%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A]">
+            <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[100px] md:w-[20%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A]">
               {!index ? (
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-3">
+                <div className="flex flex-col gap-2 pt-2">
+                  <div className="flex items-center gap-1">
                     <img
                       src={market?.network?.logoURI}
-                      alt={market?.network?.name}
-                      className="w-6 h-6 rounded-full"
+                      alt={`${market?.network?.name} chain`}
+                      title={`${market?.network?.name} chain`}
+                      className="w-5 h-5 rounded-full"
                     />
-                    <span className="text-[12px] leading-4 md:text-[14px] md:leading-5">
-                      {market?.marketId}
-                    </span>
+                    <img
+                      src={`https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${operator?.img}`}
+                      alt={`${operator?.name} operator`}
+                      title={`${operator?.name} operator`}
+                      className="w-5 h-5 rounded-full"
+                    />
+                    {market?.deprecated && (
+                      <Tippy
+                        content="Bad debts"
+                        placement="top"
+                        animation="shift-away"
+                        interactive={true}
+                        delay={[100, 50]}
+                        theme="custom"
+                      >
+                        <div
+                          className="flex items-center gap-2 cursor-help text-[#7C7E81]"
+                          onClick={(e) => {
+                            if (windowWidth <= 767) {
+                              e.stopPropagation();
+                              e.preventDefault();
+                            }
+                          }}
+                        >
+                          <QuestionIcon isWarning />
+                        </div>
+                      </Tippy>
+                    )}
                   </div>
                 </div>
               ) : null}
-              {index === 1 && market?.deprecated ? (
-                <Badge state="error" text="Bad debts" greater={true} />
+              {index === 1 ? (
+                <span className="text-[12px] leading-4 md:text-[14px] md:leading-5 text-start">
+                  {market?.marketId}
+                </span>
               ) : null}
             </div>
             <div

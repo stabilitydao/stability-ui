@@ -797,6 +797,7 @@ type TMarketReserve = {
 
 type TMarket = {
   marketId: string;
+  operator: string;
   reserves: TMarketReserve[];
   roles: { name: string; addresses: TAddress[] }[];
   deployed: string;

@@ -42,6 +42,7 @@ import {
   ArrowIcon,
   FiltersIcon,
   ArrowRightIcon,
+  QuestionIcon,
 } from "./Icons";
 
 import { EmptyTable } from "./Tables/EmptyTable";
@@ -139,4 +140,5 @@ export {
   Indicator,
   ProposalsTable,
   APRBadge,
+  QuestionIcon,
 };
