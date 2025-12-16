@@ -58,7 +58,6 @@ const Row: React.FC<IProps> = ({ market }) => {
                       alt={market?.network?.name}
                       className="w-6 h-6 rounded-full"
                     />
-
                     <span className="text-[12px] leading-4 md:text-[14px] md:leading-5">
                       {market?.marketId}
                     </span>
@@ -80,7 +79,15 @@ const Row: React.FC<IProps> = ({ market }) => {
                 alt={assetData?.symbol}
                 className="w-6 h-6 rounded-full"
               />
-              <span>{assetData?.symbol}</span>
+              <span
+                className={cn(
+                  (assetData?.symbol?.length ?? 0 > 10)
+                    ? "text-[14px]"
+                    : "text-[16px]"
+                )}
+              >
+                {assetData?.symbol}
+              </span>
             </div>
             <div
               className={cn(

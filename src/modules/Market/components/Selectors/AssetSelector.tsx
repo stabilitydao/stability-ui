@@ -21,7 +21,8 @@ const AssetSelector: React.FC<TProps> = ({
 }) => {
   const carouselRef = useRef<HTMLDivElement>(null);
 
-  const [width, setWidth] = useState(0);
+  const [width, setWidth] = useState<number>(0);
+  const [showAll, setShowAll] = useState<boolean>(false);
 
   const windowWidth = useWindowWidth();
 
@@ -102,7 +103,7 @@ const AssetSelector: React.FC<TProps> = ({
       </motion.div>
 
       <div className="hidden md:flex items-center gap-2 flex-wrap">
-        {assets.map((asset) => {
+        {assets.map((asset, index) => {
           if (
             !asset?.isBorrowable &&
             [MarketSectionTypes.Borrow, MarketSectionTypes.Repay].includes(
@@ -119,7 +120,8 @@ const AssetSelector: React.FC<TProps> = ({
                 "flex items-center gap-2 py-2 px-3 rounded-lg border cursor-pointer",
                 asset?.address === activeAsset?.address
                   ? "bg-[#232429] border-[#35363B]"
-                  : " bg-transparent border-[#232429]"
+                  : " bg-transparent border-[#232429]",
+                index > 9 && !showAll && "hidden"
               )}
               onClick={() => handleAssetChange(asset)}
             >
@@ -141,6 +143,14 @@ const AssetSelector: React.FC<TProps> = ({
             </div>
           );
         })}
+        {assets?.length > 10 ? (
+          <p
+            className="font-medium text-[14px] text-[#9180F4] cursor-pointer"
+            onClick={() => setShowAll((prev) => !prev)}
+          >
+            {showAll ? "Hide" : `Show all ${assets?.length}`}
+          </p>
+        ) : null}
       </div>
     </div>
   );

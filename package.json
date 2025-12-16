@@ -1,7 +1,7 @@
 {
   "name": "stability-ui",
   "type": "module",
-  "version": "0.11.38-alpha",
+  "version": "0.11.39-alpha",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -18,7 +18,7 @@
     "@astrojs/tailwind": "6.0.2",
     "@astrojs/vercel": "8.2.10",
     "@nanostores/react": "^0.7.1",
-    "@stabilitydao/stability": "=0.51.2",
+    "@stabilitydao/stability": "=0.56.0",
     "@tanstack/query-sync-storage-persister": "^5.22.2",
     "@tanstack/react-query": "^5.22.2",
     "@tanstack/react-query-persist-client": "^5.22.2",

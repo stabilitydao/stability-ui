@@ -110,7 +110,7 @@ const AssetInfo: React.FC<TProps> = ({
                 {asset?.assetData?.symbol} Price
               </span>
               <span className="font-semibold">
-                {convertToUSD(asset?.price)}
+                {Number(asset?.price ?? 0) ? convertToUSD(asset?.price) : "-"}
               </span>
             </div>
             <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
@@ -240,7 +240,7 @@ const AssetInfo: React.FC<TProps> = ({
                   </span>
                   <span className="font-semibold">
                     {Number(
-                      asset?.interestStrategy?.maxVariableBorrowRate
+                      asset?.interestStrategy?.maxVariableBorrowRate ?? 0
                     ).toFixed(2)}
                     %
                   </span>
@@ -251,7 +251,7 @@ const AssetInfo: React.FC<TProps> = ({
                   </span>
                   <span className="font-semibold">
                     {Number(
-                      asset?.interestStrategy?.optimalUsageRation
+                      asset?.interestStrategy?.optimalUsageRation ?? 0
                     ).toFixed(2)}
                     %
                   </span>
@@ -262,7 +262,7 @@ const AssetInfo: React.FC<TProps> = ({
                   </span>
                   <span className="font-semibold">
                     {Number(
-                      asset?.interestStrategy?.variableRateSlope1
+                      asset?.interestStrategy?.variableRateSlope1 ?? 0
                     ).toFixed(2)}
                     %
                   </span>
@@ -273,7 +273,7 @@ const AssetInfo: React.FC<TProps> = ({
                   </span>
                   <span className="font-semibold">
                     {Number(
-                      asset?.interestStrategy?.variableRateSlope2
+                      asset?.interestStrategy?.variableRateSlope2 ?? 0
                     ).toFixed(2)}
                     %
                   </span>
