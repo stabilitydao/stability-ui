@@ -10,8 +10,6 @@ import { HistoricalRate } from "./components/HistoricalRate";
 import { VaultInfo } from "./components/VaultInfo";
 import { Contracts } from "./components/Contracts";
 import { YieldRates } from "./components/YieldRates";
-import { LiquidityPool } from "./components/LiquidityPool";
-import { UnderlyingALM } from "./components/UnderlyingALM";
 import { LeverageLending } from "./components/LeverageLending";
 
 import { WagmiLayout } from "@layouts";
@@ -33,13 +31,6 @@ const LeverageVault: React.FC<IProps> = ({ network, vault }) => {
   const $error = useStore(error);
 
   const [localVault, setLocalVault] = useState<TVault>();
-
-  const isALM = useMemo(
-    () =>
-      localVault?.alm &&
-      ["Ichi", "DefiEdge", "Gamma"].includes(localVault.alm.protocol),
-    [localVault]
-  );
 
   const isLeverageLending = useMemo(
     () => !!localVault?.leverageLending,
@@ -90,15 +81,6 @@ const LeverageVault: React.FC<IProps> = ({ network, vault }) => {
             </div>
           </div>
           {isLeverageLending && <LeverageLending vault={localVault} />}
-          {(localVault.assets.length > 1 && localVault?.pool?.tvl) || isALM ? (
-            <div className="my-6 flex flex-col gap-6 w-full">
-              {localVault.assets.length > 1 && localVault?.pool?.tvl && (
-                <LiquidityPool network={network} vault={localVault} />
-              )}
-
-              {isALM && <UnderlyingALM network={network} vault={localVault} />}
-            </div>
-          ) : null}
 
           <Assets
             network={network}

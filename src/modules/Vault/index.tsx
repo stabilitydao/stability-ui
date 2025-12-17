@@ -12,7 +12,6 @@ import { Contracts } from "./components/Contracts";
 import { YieldRates } from "./components/YieldRates";
 import { LiquidityPool } from "./components/LiquidityPool";
 import { UnderlyingALM } from "./components/UnderlyingALM";
-import { LeverageLending } from "./components/LeverageLending";
 
 import { WagmiLayout } from "@layouts";
 import { FullPageLoader, ErrorMessage } from "@ui";
@@ -38,11 +37,6 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
     () =>
       localVault?.alm &&
       ["Ichi", "DefiEdge", "Gamma"].includes(localVault.alm.protocol),
-    [localVault]
-  );
-
-  const isLeverageLending = useMemo(
-    () => !!localVault?.leverageLending,
     [localVault]
   );
 
@@ -89,7 +83,6 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
               <Strategy network={network} vault={localVault} />
             </div>
           </div>
-          {isLeverageLending && <LeverageLending vault={localVault} />}
           {(localVault.assets.length > 1 && localVault?.pool?.tvl) || isALM ? (
             <div className="my-6 flex flex-col gap-6 w-full">
               {localVault.assets.length > 1 && localVault?.pool?.tvl && (
