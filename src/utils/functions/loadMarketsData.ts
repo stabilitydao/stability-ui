@@ -24,8 +24,13 @@ const loadMarketsData = async (
     const apiMarket = markets?.[+chainId]?.[marketId];
 
     const reserves: TMarketReserve[] = libMarket.reserves.map((reserve) => {
-      const backendData =
-        apiMarket?.reserves?.[reserve?.asset?.toLowerCase()] ?? {};
+      // const backendData =
+      //   apiMarket?.reserves?.[reserve?.asset?.toLowerCase()] ?? {};
+
+      const backendData = apiMarket?.reserves?.find(
+        (_reserve) =>
+          _reserve?.aToken?.toLowerCase() === reserve?.aToken?.toLowerCase()
+      );
 
       return {
         address: reserve.asset,
