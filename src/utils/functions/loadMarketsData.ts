@@ -25,7 +25,7 @@ const loadMarketsData = async (
 
     const reserves: TMarketReserve[] = libMarket.reserves.map((reserve) => {
       const backendData =
-        apiMarket?.reserves?.[reserve.asset.toLowerCase()] ?? {};
+        apiMarket?.reserves?.[reserve?.asset?.toLowerCase()] ?? {};
 
       return {
         address: reserve.asset,
@@ -90,6 +90,7 @@ const loadMarketsData = async (
 
     const mergedMarket: TMarket = {
       marketId: marketId,
+      operator: libMarket.operator,
       engine: libMarket.engine,
       pool: libMarket.pool,
       protocolDataProvider: libMarket.protocolDataProvider,

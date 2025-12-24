@@ -1,3 +1,5 @@
+import { QuestionIcon } from "@ui";
+
 import { getTokenData } from "@utils";
 
 import type { TMarketReserve, TAddress } from "@types";
@@ -70,11 +72,7 @@ const LeveragePositionStats: React.FC<TProps> = ({ asset }) => {
           <div className="flex items-start justify-between text-[16px] leading-6 w-full">
             <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
               <span>Sum supply</span>
-              <img
-                src="/icons/circle_question.png"
-                alt="Question icon"
-                className="w-4 h-4"
-              />
+              <QuestionIcon />
             </div>
             <div className="flex flex-col items-end">
               <div className="flex items-center gap-2 text-[16px] leading-6">
@@ -94,11 +92,7 @@ const LeveragePositionStats: React.FC<TProps> = ({ asset }) => {
           <div className="flex items-center justify-between text-[16px] leading-6 w-full">
             <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
               <span>Borrowed</span>
-              <img
-                src="/icons/circle_question.png"
-                alt="Question icon"
-                className="w-4 h-4"
-              />
+              <QuestionIcon />
             </div>
             <span className="font-semibold text-[#7C7E81]">
               0 {assetData?.symbol}
@@ -107,11 +101,7 @@ const LeveragePositionStats: React.FC<TProps> = ({ asset }) => {
           <div className="flex items-center justify-between text-[16px] leading-6 w-full">
             <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
               <span>Leverage Used</span>
-              <img
-                src="/icons/circle_question.png"
-                alt="Question icon"
-                className="w-4 h-4"
-              />
+              <QuestionIcon />
             </div>
             <span className="font-semibold">1x</span>
           </div>
@@ -120,11 +110,7 @@ const LeveragePositionStats: React.FC<TProps> = ({ asset }) => {
           <div className="flex items-start justify-between text-[16px] leading-6 w-full">
             <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
               <span>Net points</span>
-              <img
-                src="/icons/circle_question.png"
-                alt="Question icon"
-                className="w-4 h-4"
-              />
+              <QuestionIcon />
             </div>
             <div className="flex flex-col items-end">
               <span className="flex items-center gap-2 text-[16px] leading-6">
@@ -139,22 +125,14 @@ const LeveragePositionStats: React.FC<TProps> = ({ asset }) => {
           <div className="flex items-center justify-between text-[16px] leading-6 w-full">
             <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
               <span>Health Factor</span>
-              <img
-                src="/icons/circle_question.png"
-                alt="Question icon"
-                className="w-4 h-4"
-              />
+              <QuestionIcon />
             </div>
             <span className="font-semibold text-[#7C7E81]">--</span>
           </div>
           <div className="flex items-center justify-between text-[16px] leading-6 w-full">
             <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
               <span>Net APR</span>
-              <img
-                src="/icons/circle_question.png"
-                alt="Question icon"
-                className="w-4 h-4"
-              />
+              <QuestionIcon />
             </div>
             <span className="font-semibold">3.7%</span>
           </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Toggler } from "@ui";
+import { Toggler, QuestionIcon } from "@ui";
 
 import { cn, getTokenData } from "@utils";
 
@@ -106,44 +106,28 @@ const LeverageForm: React.FC<TProps> = ({ asset }) => {
           <div className="flex items-center justify-between w-full">
             <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
               <span>Borrowable supply</span>
-              <img
-                src="/icons/circle_question.png"
-                alt="Question icon"
-                className="w-4 h-4"
-              />
+              <QuestionIcon />
             </div>
             <Toggler checked={true} onChange={() => console.log(1)} />
           </div>
           <div className="flex items-center justify-between w-full">
             <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
               <span>Price impact</span>
-              <img
-                src="/icons/circle_question.png"
-                alt="Question icon"
-                className="w-4 h-4"
-              />
+              <QuestionIcon />
             </div>
             <span className="font-semibold">0.0%</span>
           </div>
           <div className="flex items-center justify-between w-full">
             <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
               <span>Route</span>
-              <img
-                src="/icons/circle_question.png"
-                alt="Question icon"
-                className="w-4 h-4"
-              />
+              <QuestionIcon />
             </div>
             <span className="font-semibold">0 DOS</span>
           </div>
           <div className="flex items-center justify-between w-full">
             <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
               <span>Slippage</span>
-              <img
-                src="/icons/circle_question.png"
-                alt="Question icon"
-                className="w-4 h-4"
-              />
+              <QuestionIcon />
             </div>
             <span className="font-semibold">0.5%</span>
           </div>

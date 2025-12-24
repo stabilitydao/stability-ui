@@ -1,6 +1,8 @@
 import { LeverageForm } from "../Forms/LeverageForm";
 import { LeveragePositionStats } from "../Stats/LeveragePositionStats";
 
+import { QuestionIcon } from "@ui";
+
 import { getTokenData } from "@utils";
 
 import type { TMarketReserve, TAddress } from "@types";
@@ -200,33 +202,21 @@ const LeverageTab: React.FC<TProps> = ({ asset }) => {
             <div className="w-full flex items-center justify-between">
               <div className="text-[#7C7E81] flex items-center gap-2">
                 <span>Leverage fee</span>
-                <img
-                  src="/icons/circle_question.png"
-                  alt="Question icon"
-                  className="w-4 h-4"
-                />
+                <QuestionIcon />
               </div>
               <span className="font-semibold">0.0%</span>
             </div>
             <div className="w-full flex items-center justify-between">
               <div className="text-[#7C7E81] flex items-center gap-2">
                 <span>Protocol fee</span>
-                <img
-                  src="/icons/circle_question.png"
-                  alt="Question icon"
-                  className="w-4 h-4"
-                />
+                <QuestionIcon />
               </div>
               <span className="font-semibold">15.0%</span>
             </div>
             <div className="w-full flex items-center justify-between">
               <div className="text-[#7C7E81] flex items-center gap-2">
                 <span>Deployer fee</span>
-                <img
-                  src="/icons/circle_question.png"
-                  alt="Question icon"
-                  className="w-4 h-4"
-                />
+                <QuestionIcon />
               </div>
               <span className="font-semibold">0.0%</span>
             </div>

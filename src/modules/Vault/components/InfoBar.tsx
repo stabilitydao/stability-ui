@@ -383,6 +383,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               {earnData.dailyEarn}$
             </p>
           }
+          hiddenOnMobile
         />
 
         <FieldValue

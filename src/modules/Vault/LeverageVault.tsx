@@ -10,8 +10,7 @@ import { HistoricalRate } from "./components/HistoricalRate";
 import { VaultInfo } from "./components/VaultInfo";
 import { Contracts } from "./components/Contracts";
 import { YieldRates } from "./components/YieldRates";
-import { LiquidityPool } from "./components/LiquidityPool";
-import { UnderlyingALM } from "./components/UnderlyingALM";
+import { LeverageLending } from "./components/LeverageLending";
 
 import { WagmiLayout } from "@layouts";
 import { FullPageLoader, ErrorMessage } from "@ui";
@@ -25,7 +24,7 @@ interface IProps {
   vault: TAddress;
 }
 
-const Vault: React.FC<IProps> = ({ network, vault }) => {
+const LeverageVault: React.FC<IProps> = ({ network, vault }) => {
   const $vaultData = useStore(vaultData);
   const $vaults = useStore(vaults);
 
@@ -33,10 +32,8 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
 
   const [localVault, setLocalVault] = useState<TVault>();
 
-  const isALM = useMemo(
-    () =>
-      localVault?.alm &&
-      ["Ichi", "DefiEdge", "Gamma"].includes(localVault.alm.protocol),
+  const isLeverageLending = useMemo(
+    () => !!localVault?.leverageLending,
     [localVault]
   );
 
@@ -83,15 +80,7 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
               <Strategy network={network} vault={localVault} />
             </div>
           </div>
-          {(localVault.assets.length > 1 && localVault?.pool?.tvl) || isALM ? (
-            <div className="my-6 flex flex-col gap-6 w-full">
-              {localVault.assets.length > 1 && localVault?.pool?.tvl && (
-                <LiquidityPool network={network} vault={localVault} />
-              )}
-
-              {isALM && <UnderlyingALM network={network} vault={localVault} />}
-            </div>
-          ) : null}
+          {isLeverageLending && <LeverageLending vault={localVault} />}
 
           <Assets
             network={network}
@@ -117,4 +106,5 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
     </div>
   );
 };
-export { Vault };
+
+export { LeverageVault };

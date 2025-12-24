@@ -7,6 +7,7 @@ import {
   TimeDifferenceIndicator,
   StrategyBadge,
   ArrowRightIcon,
+  QuestionIcon,
 } from "@ui";
 
 import { cn, formatNumber, useWindowWidth } from "@utils";
@@ -48,13 +49,10 @@ const Vault: React.FC<IProps> = ({
 
   const [expandedData, setExpandedData] = useState(false);
 
-  const isSTBLVault =
-    Array.isArray(vault?.assets) &&
-    vault.assets.some((asset) => asset?.symbol && asset?.symbol === "STBL");
-
   const symbol =
     vault.type === VaultTypes.Vault
-      ? VAULTS_WITH_NAME[vault.address] || vault.assetsSymbol
+      ? VAULTS_WITH_NAME?.[vault?.address as keyof typeof VAULTS_WITH_NAME] ||
+        vault.assetsSymbol
       : vault.symbol;
 
   const isDimmed =
@@ -249,16 +247,6 @@ const Vault: React.FC<IProps> = ({
                       {formatNumber(APRs?.dailyAPR ?? 0, "formatAPR")}%
                     </p>
                   </div>
-                  {!isSTBLVault && (
-                    <div className="flex items-center justify-between">
-                      <p className="leading-5 text-[#97979A] font-medium">
-                        Gems APR
-                      </p>
-                      <p className="text-end font-semibold">
-                        {formatNumber(APRs?.gemsAPR ?? 0, "formatAPR")}%
-                      </p>
-                    </div>
-                  )}
                 </div>
                 <div className="flex items-center justify-between w-full gap-2">
                   <p className="leading-5 text-[#97979A] font-medium">
@@ -285,13 +273,7 @@ const Vault: React.FC<IProps> = ({
                   </p>
                 )}
               </div>
-              {vault.type === VaultTypes.Vault && (
-                <img
-                  src="/icons/circle_question.png"
-                  alt="Question icon"
-                  className="w-3 h-3"
-                />
-              )}
+              {vault.type === VaultTypes.Vault && <QuestionIcon />}
             </div>
           </Tippy>
         </div>

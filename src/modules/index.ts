@@ -3,6 +3,7 @@ import { Factory } from "./Factory";
 import { Farms } from "./Factory/Farms";
 import { Vaults } from "./Vaults";
 import { Vault } from "./Vault";
+import { LeverageVault } from "./Vault/LeverageVault";
 import { Platform } from "./Platform";
 import { Assets } from "./Platform/components/Assets";
 import { Chains } from "./Platform/components/Chains";
@@ -63,4 +64,5 @@ export {
   DAO,
   Season1,
   Season2,
+  LeverageVault,
 };

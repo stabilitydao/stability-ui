@@ -13,6 +13,7 @@ import { FiltersIcon } from "./Filters";
 import { ArrowRightIcon } from "./ArrowRight";
 import { LendingIcon } from "./Lending";
 import { DAOIcon } from "./DAO";
+import { QuestionIcon } from "./Question";
 
 export {
   DashboardIcon,
@@ -30,4 +31,5 @@ export {
   ArrowRightIcon,
   LendingIcon,
   DAOIcon,
+  QuestionIcon,
 };

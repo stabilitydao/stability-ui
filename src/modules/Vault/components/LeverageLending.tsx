@@ -32,7 +32,7 @@ const LeverageLending: React.FC<IProps> = memo(({ vault }) => {
   );
 
   return (
-    <div className="w-full md:w-1/2">
+    <div className="w-full">
       <HeadingText
         text="Leverage Lending"
         scale={2}
@@ -82,6 +82,34 @@ const LeverageLending: React.FC<IProps> = memo(({ vault }) => {
             </p>
           </div>
           {!!vault?.assetAPR && borrowAPRComponent}
+        </div>
+        <div className="flex gap-5 sm:gap-0 items-start justify-between w-full">
+          <div>
+            <p className="font-medium leading-5 text-[#97979A] text-[14px]">
+              MIN TARGET LTV
+            </p>
+            <p className="text-[20px] leading-6 font-semibold mt-1 flex items-center">
+              {vault?.leverageLending?.minTargetLtv}%
+            </p>
+          </div>
+          <div className="w-1/2">
+            <p className="font-medium leading-5 text-[#97979A] text-[14px]">
+              MAX TARGET LTV
+            </p>
+            <p className="text-[20px] leading-6 font-semibold mt-1 flex items-center">
+              {vault?.leverageLending?.maxTargetLtv}%
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-5 sm:gap-0 items-start justify-between w-full">
+          <div>
+            <p className="font-medium leading-5 text-[#97979A] text-[14px]">
+              LT
+            </p>
+            <p className="text-[20px] leading-6 font-semibold mt-1 flex items-center">
+              {vault?.leverageLending?.lt}%
+            </p>
+          </div>
         </div>
       </div>
     </div>

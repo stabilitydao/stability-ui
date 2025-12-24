@@ -2,7 +2,7 @@ import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
 import { createWalletClient, http, createPublicClient } from "viem";
 
-import { avalanche, sonic, plasma } from "viem/chains";
+import { mainnet, avalanche, sonic, plasma } from "viem/chains";
 
 import { deployments } from "@stabilitydao/stability";
 
@@ -94,7 +94,7 @@ const metadata = {
 };
 
 const wagmiConfig = defaultWagmiConfig({
-  chains: [sonic, avalanche, plasma],
+  chains: [mainnet, sonic, avalanche, plasma],
   projectId: walletConnectProjectId,
   metadata,
 });
@@ -102,6 +102,11 @@ const wagmiConfig = defaultWagmiConfig({
 const walletClient = createWalletClient({
   chain: sonic,
   transport: http(),
+});
+
+const ethereumClient = createPublicClient({
+  chain: mainnet,
+  transport: http("https://ethereum.publicnode.com"),
 });
 
 const sonicClient = createPublicClient({
@@ -120,6 +125,7 @@ const plasmaClient = createPublicClient({
 });
 
 const web3clients = {
+  "1": ethereumClient,
   "146": sonicClient,
   "43114": avalancheClient,
   "9745": plasmaClient,

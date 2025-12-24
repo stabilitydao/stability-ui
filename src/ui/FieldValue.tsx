@@ -1,13 +1,27 @@
+import { cn } from "@utils";
+
 interface IProps {
   name: string;
   value: any;
   bottomValue?: string;
   testId?: string;
+  hiddenOnMobile?: boolean;
 }
 
-const FieldValue: React.FC<IProps> = ({ name, value, bottomValue, testId }) => {
+const FieldValue: React.FC<IProps> = ({
+  name,
+  value,
+  bottomValue,
+  testId,
+  hiddenOnMobile = false,
+}) => {
   return (
-    <div className="flex items-start justify-between w-full flex-col gap-1">
+    <div
+      className={cn(
+        "flex items-start justify-between w-full flex-col gap-1",
+        hiddenOnMobile && "hidden md:flex"
+      )}
+    >
       <div className="flex text-[12px] md:text-[14px] leading-5 text-[#97979A]">
         {name}
       </div>

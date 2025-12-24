@@ -319,6 +319,9 @@ type TLeverageLendingData = {
   borrowApr: number;
   leverage: number;
   ltv: number;
+  minTargetLtv: number;
+  maxTargetLtv: number;
+  lt: number;
   maxLtv: number;
   supplyApr: number;
   targetLeveragePercent: number;
@@ -797,6 +800,7 @@ type TMarketReserve = {
 
 type TMarket = {
   marketId: string;
+  operator: string;
   reserves: TMarketReserve[];
   roles: { name: string; addresses: TAddress[] }[];
   deployed: string;

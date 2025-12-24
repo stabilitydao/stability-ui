@@ -51,9 +51,9 @@ const Swapper = (): JSX.Element => {
 
   const initTablesData = async () => {
     try {
-      const GRAPH_URL = GRAPH_ENDPOINTS[$currentChainID];
-
-      const GRAPH_QUERY = `{
+      const GRAPH_URL = GRAPH_ENDPOINTS?.[$currentChainID];
+      if (GRAPH_URL) {
+        const GRAPH_QUERY = `{
               bcpoolEntities {
                   pool
                   id
@@ -69,14 +69,15 @@ const Swapper = (): JSX.Element => {
                   tokenOut
               }}`;
 
-      const graphResponse = await axios.post(GRAPH_URL, {
-        query: GRAPH_QUERY,
-      });
+        const graphResponse = await axios.post(GRAPH_URL, {
+          query: GRAPH_QUERY,
+        });
 
-      const data = graphResponse.data.data;
+        const data = graphResponse.data.data;
 
-      setPoolTableData(data.poolEntities);
-      // setBCPoolTableData(data.bcpoolEntities);
+        setPoolTableData(data.poolEntities);
+        // setBCPoolTableData(data.bcpoolEntities);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -84,6 +85,7 @@ const Swapper = (): JSX.Element => {
 
   const AMM_ADAPTERS = useMemo(() => {
     const adapters = deployments?.[$currentChainID]?.ammAdapters;
+    console.log(deployments?.[$currentChainID]?.ammAdapters);
     if (!adapters) return [];
 
     return Object.entries(adapters).map(([name, address]) => ({

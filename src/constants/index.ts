@@ -170,6 +170,15 @@ const ETHERFI_POINTS = {
 
 const CHAINS = [
   {
+    name: chains["1"].name,
+    id: "1",
+    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["1"].img}`,
+    explorer: "https://etherscan.io",
+    nativeCurrency: "ETH",
+    color: "#FFFFFF",
+    active: false,
+  },
+  {
     name: chains["146"].name,
     id: "146",
     logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["146"].img}`,
@@ -324,15 +333,7 @@ const PATHS = [
 ];
 
 const ROUTES = {
-  basic: [
-    "staking",
-    "dashboard",
-    "leverage-vaults",
-    "alm",
-    "agents",
-    "lending",
-    "dao",
-  ],
+  basic: ["staking", "dashboard", "alm", "agents", "lending", "dao"],
   platform: [
     "platform",
     "strategies",
