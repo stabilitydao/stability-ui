@@ -1,5 +1,5 @@
 export const getSpecificSymbol = (specific: string): string => {
-  const parts = specific.trim().split(/\s+/);
+  const parts = specific ? specific.trim().split(/\s+/) : "";
 
   for (const part of parts) {
     if (!/^\d+(\.\d+)?$/.test(part)) {
