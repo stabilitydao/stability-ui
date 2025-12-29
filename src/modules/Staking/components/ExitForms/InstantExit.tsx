@@ -16,12 +16,16 @@ import { sonicClient, ERC20ABI, IXSTBLABI, wagmiConfig } from "@web3";
 
 import { STABILITY_TOKENS } from "@constants";
 
+import { daos } from "@stabilitydao/stability";
+
 import type { TAddress } from "@types";
 
 const InstantExit: React.FC = () => {
   const $connected = useStore(connected);
   const $account = useStore(account);
   const $lastTx = useStore(lastTx);
+
+  const stabilityDAO = daos?.find(({ name }) => name === "Stability");
 
   const input = useRef<HTMLInputElement>(null);
 
@@ -126,8 +130,9 @@ const InstantExit: React.FC = () => {
           Instant Exit
         </span>
         <span className="text-[16px] leafing-6 font-medium text-[#97979A]">
-          Instantly exit to STBL, incurring a 80% penalty. This process cannot
-          be reverted, all forfeited STBL is streamed back to stakers.
+          Instantly exit to STBL, incurring a {stabilityDAO?.params?.pvpFee}%
+          penalty. This process cannot be reverted, all forfeited STBL is
+          streamed back to stakers.
         </span>
       </div>
       <div className="flex flex-col justify-between gap-4">

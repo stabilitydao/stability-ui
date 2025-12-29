@@ -18,12 +18,18 @@ import { account, connected, lastTx } from "@store";
 
 import { STABILITY_TOKENS } from "@constants";
 
+import { daos } from "@stabilitydao/stability";
+
 import type { TAddress, TVestPeriod } from "@types";
 
 const VestedExit: React.FC = () => {
   const $connected = useStore(connected);
   const $account = useStore(account);
   const $lastTx = useStore(lastTx);
+
+  const stabilityDAO = daos?.find(({ name }) => name === "Stability");
+
+  const ratio = (100 - Number(stabilityDAO?.params?.pvpFee)) / 100;
 
   const input = useRef<HTMLInputElement>(null);
   const dropDownRef = useRef<HTMLDivElement>(null);
@@ -280,8 +286,8 @@ const VestedExit: React.FC = () => {
 
         <span className="text-[16px] leafing-6 font-medium text-[#97979A]">
           Redeem xSTBL over a vesting period. Choose a minimum vest of 15 days
-          (1:0.5 ratio) to maximum vest of 6 months (1:1 ratio). You can cancel
-          the vest in the first 14 days.
+          (1:{ratio} ratio) to maximum vest of 6 months (1:1 ratio). You can
+          cancel the vest in the first 14 days.
         </span>
       </div>
       <div>

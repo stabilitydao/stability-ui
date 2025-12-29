@@ -18,10 +18,14 @@ import { useVestingData } from "./hooks";
 
 import { getInitialStateFromUrl } from "./functions";
 
+import { daos } from "@stabilitydao/stability";
+
 import { DAOSectionTypes } from "@types";
 
 const DAO = (): JSX.Element => {
   const { data: vestingData, isLoading } = useVestingData("146");
+
+  const stabilityDAO = daos?.find(({ name }) => name === "Stability");
 
   const { section } = getInitialStateFromUrl();
 
@@ -72,7 +76,9 @@ const DAO = (): JSX.Element => {
                   <span className="text-[#97979A] text-[16px] leading-5 font-medium">
                     xSTBL instant exit fee
                   </span>
-                  <span className="font-semibold">80%</span>
+                  <span className="font-semibold">
+                    {stabilityDAO?.params?.pvpFee}%
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-[#97979A] text-[16px] leading-5 font-medium">
