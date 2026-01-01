@@ -1,32 +1,32 @@
-"use client";
+import { useState, useEffect, useMemo, useCallback } from "react";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { erc20Abi, Address } from "viem";
+import { Address, erc20Abi } from "viem";
 import { readContract } from "@wagmi/core";
-import { dashboardData, tokenColumns, tokenData, poolColumns, poolData } from "./constants/data";
-import { CheckmarkIcon, CopyIcon, ExternalLinkIcon, SearchIcon } from "./ui/icons";
+
+import { TablePagination, PriceCell, Dashboard } from "./components";
+
 import { FullPageLoader } from "@ui";
+
+import { getShortAddress } from "@utils";
+
+import {
+  dashboardData,
+  tokenColumns,
+  tokenData,
+  poolColumns,
+  poolData,
+} from "./constants";
+
 import { wagmiConfig, RamsesV3PoolABI } from "@web3";
-import { DashboardGrid } from "./components/Dashboard";
+
 import { GetPriceReturn, PriceCache, Token } from "./types";
-import { PriceCell } from "./components/PriceCell";
-import { TablePagination } from "./components/TablePagination";
 
-/* ----------------------------- Utilities ----------------------------- */
-
-const truncateAddress = (address: string) =>
-  `${address.slice(0, 6)}...${address.slice(-4)}`;
-
-/* -------------------------- RecoveryDashboard ------------------------- */
-
-const RecoveryDashboard: React.FC = (): JSX.Element => {
-  // UI state
+const RecoveryDashboard = (): JSX.Element => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Caches
   const [priceCache, setPriceCache] = useState<PriceCache>({});
   const [tokenBurnProgress, setTokenBurnProgress] = useState<
     Record<string, number>
@@ -34,12 +34,10 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
   const [averageBurnRate, setAverageBurnRate] = useState<number | null>(null);
   const [totalBurnPercent, setTotalBurnPercent] = useState<number | null>(null);
 
-  // Flags
   const [isTokensLoaded, setIsTokensLoaded] = useState(false);
   const [isPoolsLoaded, setIsPoolsLoaded] = useState(false);
   const [isDashboardLoaded, setIsDashboardLoaded] = useState(false);
 
-  // Derived single loading flag
   const isLoading = !(
     isTokensLoaded &&
     isPoolsLoaded &&
@@ -48,17 +46,11 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
     isDashboardLoaded
   );
 
-  /* -------------------------- Callbacks -------------------------- */
-
   const handleCopyAddress = useCallback((address: string, id: string) => {
     navigator.clipboard.writeText(address).then(() => {
       setCopiedId(id);
       window.setTimeout(() => setCopiedId(null), 2000);
     });
-  }, []);
-
-  const handleExternalLink = useCallback((address: string) => {
-    window.open(`https://sonicscan.org/address/${address}`, "_blank");
   }, []);
 
   const getPriceOnChain = useCallback(
@@ -157,14 +149,12 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
 
         totalInitial += token.initialSupply;
         totalBurned += token.initialSupply - currentSupply;
-      } catch { }
+      } catch {}
     }
 
     if (totalInitial === 0n) return 0;
     return Number((totalBurned * 10000n) / totalInitial) / 100;
   }, []);
-
-  /* -------------------------- Fetch Flows -------------------------- */
 
   useEffect(() => {
     let mounted = true;
@@ -240,15 +230,13 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
     }
   }, [isTokensLoaded, isPoolsLoaded, averageBurnRate, totalBurnPercent]);
 
-  /* -------------------------- Derived & Pagination -------------------------- */
-
   const filteredPools = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return poolData;
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return poolData;
     return poolData.filter(
       (pool) =>
-        pool.pair.toLowerCase().includes(q) ||
-        pool.address.toLowerCase().includes(q)
+        pool.pair.toLowerCase().includes(query) ||
+        pool.address.toLowerCase().includes(query)
     );
   }, [searchQuery]);
 
@@ -263,8 +251,6 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPools = filteredPools.slice(startIndex, endIndex);
-
-  /* -------------------------- Handlers -------------------------- */
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -283,206 +269,250 @@ const RecoveryDashboard: React.FC = (): JSX.Element => {
   );
 
   return (
-    <>
-      <div className="space-y-10">
-        {/* ----------------------- Dashboard Section ----------------------- */}
-        <section>
-          <h1 className="text-white font-semibold text-[clamp(30px,1vw+26px,38px)] leading-loose -mb-1 text-start">
-            Recovery Dashboard
-          </h1>
+    <div className="space-y-10">
+      <div>
+        <h1 className="text-white font-semibold text-[clamp(30px,1vw+26px,38px)] leading-loose -mb-1 text-start">
+          Recovery Dashboard
+        </h1>
 
-          <p className="text-[#9798A4] font-medium text-[clamp(18px,0.28vw+18px,20px)]">
-            Monitor recovery pool prices and token burn progress
-          </p>
+        <p className="text-[#9798A4] font-medium text-[clamp(18px,0.28vw+18px,20px)]">
+          Monitor recovery pool prices and token burn progress
+        </p>
 
-          {!isLoading && (
-            <DashboardGrid
-              cards={dashboardData}
-              averageBurnRate={averageBurnRate}
-              totalBurnPercent={totalBurnPercent}
-            />
-          )}
-        </section>
+        {!isLoading && (
+          <Dashboard
+            cards={dashboardData}
+            averageBurnRate={averageBurnRate}
+            totalBurnPercent={totalBurnPercent}
+          />
+        )}
+      </div>
+      {isLoading ? (
+        <div className="flex justify-center items-center py-24 min-w-full lg:min-w-[960px] xl:min-w-[1200px]">
+          <FullPageLoader />
+        </div>
+      ) : (
+        <div>
+          <div>
+            <h1 className="text-white leading-loose text-[clamp(20px,0.5vw+19px,24px)] font-semibold -mb-1 text-start">
+              Recovery Tokens
+            </h1>
+            <p className="text-[#97979A] font-medium text-[clamp(14px,0.35vw+13px,16px)]">
+              Monitor recovery token burn progress
+            </p>
 
-        {isLoading ? (
-          <div className="flex justify-center items-center py-24 min-w-full lg:min-w-[960px] xl:min-w-[1200px]">
-            <FullPageLoader />
-          </div>
-        ) : (
-          <>
-            {/* ----------------------- Recovery Tokens ----------------------- */}
-            <section>
-              <h1 className="text-white leading-loose text-[clamp(20px,0.5vw+19px,24px)] font-semibold -mb-1 text-start">
-                Recovery Tokens
-              </h1>
-              <p className="text-[#97979A] font-medium text-[clamp(14px,0.35vw+13px,16px)]">
-                Monitor recovery token burn progress
-              </p>
+            <div className="bg-[#101012] border border-[#23252A] rounded-lg overflow-hidden mt-4">
+              <div className="overflow-x-auto">
+                <div className="min-w-[600px]">
+                  <div
+                    className="grid gap-4 px-6 py-3 bg-[#151618] border-b border-[#23252A] text-[#97979A] text-sm font-semibold"
+                    style={{
+                      gridTemplateColumns: "clamp(60px, 15vw, 250px) 1fr 2fr",
+                    }}
+                  >
+                    {tokenColumns.map((column) => (
+                      <div key={column.label}>{column.label}</div>
+                    ))}
+                  </div>
 
-              <div className="bg-[#101012] border border-[#23252A] rounded-lg overflow-hidden mt-4">
-                <div className="overflow-x-auto">
-                  <div className="min-w-[600px]">
+                  {tokenData.map((token) => (
                     <div
-                      className="grid gap-4 px-6 py-3 bg-[#151618] border-b border-[#23252A] text-[#97979A] text-sm font-semibold"
-                      style={{ gridTemplateColumns: "clamp(60px, 15vw, 250px) 1fr 2fr" }}
+                      key={token.name}
+                      className="grid gap-4 px-6 h-16 border-b border-[#23252A] last:border-b-0 items-center"
+                      style={{
+                        gridTemplateColumns: "clamp(60px, 15vw, 250px) 1fr 2fr",
+                      }}
                     >
-                      {tokenColumns.map((column) => (
-                        <div key={column.label}>{column.label}</div>
-                      ))}
-                    </div>
+                      <a
+                        className="text-white truncate font-semibold text-sm"
+                        href={`https://sonicscan.org/address/${token.address}`}
+                        target="_blank"
+                      >
+                        {token.symbol}
+                      </a>
 
-                    {tokenData.map((token) => (
+                      <div className="flex items-center gap-2">
+                        <span className="text-[#EAECEF] font-mono text-sm">
+                          {getShortAddress(token.address, 6, 4)}
+                        </span>
+
+                        <button
+                          onClick={() =>
+                            handleCopyAddress(token.address, token.address)
+                          }
+                          className="h-6 w-6 flex items-center justify-center"
+                        >
+                          {copiedId === token.address ? (
+                            <img
+                              className="flex-shrink-0 w-3 h-3"
+                              src="/icons/checkmark.svg"
+                              alt="Checkmark icon"
+                            />
+                          ) : (
+                            <img
+                              className="flex-shrink-0 w-3 h-3 cursor-pointer"
+                              src="/icons/copy.png"
+                              alt="Copy icon"
+                            />
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <div className="flex-1">
+                          <div className="text-[#97979A] text-sm mb-2">
+                            {getBurnStatus(token.address)}
+                          </div>
+                          <div className="w-full bg-[#23252A] rounded-full h-2">
+                            <div
+                              className="bg-[#7C3BED] h-2 rounded-full transition-all duration-300"
+                              style={{
+                                width: `${tokenBurnProgress[token.address] ?? 0}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <span className="text-[#97979A] font-semibold text-sm min-w-[50px] text-right">
+                          {(tokenBurnProgress[token.address] ?? 0).toFixed(2)} %
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="pb-10">
+            <h1 className="text-white leading-12 text-[clamp(32px,2.86vw,40px)] font-bold mb-2 text-start">
+              Recovery Pools
+            </h1>
+            <p className="text-[#97979A] leading-8 text-[clamp(18px,0.28vw+18px,20px)] font-medium">
+              View recovery pool prices and trading pairs
+            </p>
+
+            <div className="bg-[#151618] border-b border-[#23252A] rounded-lg overflow-hidden mt-4 p-6">
+              <div className="relative">
+                <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                  <img
+                    src="/search.svg"
+                    alt="Search"
+                    className="w-4 h-4 text-[#97979A]"
+                  />
+                </span>
+                <input
+                  type="text"
+                  placeholder="Search pool by pair or address..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  className="w-full max-w-lg bg-transparent border border-[#626366] rounded-lg pl-10 pr-4 py-2 text-[#97979A] placeholder-[#97979A] focus:outline-none text-sm md:text-base font-medium"
+                />
+              </div>
+            </div>
+
+            <div className="bg-[#101012] border border-[#23252A] rounded-lg overflow-hidden mt-4 w-full">
+              <div className="overflow-x-auto">
+                <div className="min-w-[600px]">
+                  <div
+                    className="grid gap-8 px-6 py-3 bg-[#151618] border-b border-[#23252A] text-[#9798A4] text-sm font-medium"
+                    style={{
+                      gridTemplateColumns:
+                        "clamp(60px, 23vw, 320px) clamp(150px, 43vw, 600px) 1fr",
+                    }}
+                  >
+                    {poolColumns.map((column) => (
+                      <div key={column.label}>{column.label}</div>
+                    ))}
+                  </div>
+
+                  {currentPools.length > 0 ? (
+                    currentPools.map((pool) => (
                       <div
-                        key={token.name}
-                        className="grid gap-4 px-6 h-16 border-b border-[#23252A] last:border-b-0 items-center"
-                        style={{ gridTemplateColumns: "clamp(60px, 15vw, 250px) 1fr 2fr" }}
+                        key={pool.name}
+                        className="grid gap-8 px-6 py-4 border-b border-[#23252A] items-center"
+                        style={{
+                          gridTemplateColumns:
+                            "clamp(60px, 23vw, 320px) clamp(150px, 43vw, 600px) 1fr",
+                        }}
                       >
                         <a
                           className="text-white truncate font-semibold text-sm"
-                          href={`https://sonicscan.org/address/${token.address}`}
+                          href={pool.url}
+                          target="_blank"
                         >
-                          {token.symbol}
+                          {pool.pair}
                         </a>
 
                         <div className="flex items-center gap-2">
                           <span className="text-[#EAECEF] font-mono text-sm">
-                            {truncateAddress(token.address)}
+                            {getShortAddress(pool.address, 6, 4)}
                           </span>
 
                           <button
-                            onClick={() => handleCopyAddress(token.address, token.address)}
+                            onClick={() =>
+                              handleCopyAddress(pool.address, pool.address)
+                            }
                             className="h-6 w-6 flex items-center justify-center"
                           >
-                            {copiedId === token.address ? (<CheckmarkIcon />) : (<CopyIcon />)}
-                          </button>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                          <div className="flex-1">
-                            <div className="text-[#97979A] text-sm mb-2">
-                              {getBurnStatus(token.address)}
-                            </div>
-                            <div className="w-full bg-[#23252A] rounded-full h-2">
-                              <div
-                                className="bg-[#7C3BED] h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${tokenBurnProgress[token.address] ?? 0}%` }}
+                            {copiedId === pool.address ? (
+                              <img
+                                className="flex-shrink-0 w-3 h-3"
+                                src="/icons/checkmark.svg"
+                                alt="Checkmark icon"
                               />
-                            </div>
-                          </div>
-
-                          <span className="text-[#97979A] font-semibold text-sm min-w-[50px] text-right">
-                            {(tokenBurnProgress[token.address] ?? 0).toFixed(2)} %
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* ----------------------- Recovery Pools ----------------------- */}
-            <section className="pb-10">
-              <h1 className="text-white leading-12 text-[clamp(32px,2.86vw,40px)] font-bold mb-2 text-start">
-                Recovery Pools
-              </h1>
-              <p className="text-[#97979A] leading-8 text-[clamp(18px,0.28vw+18px,20px)] font-medium">
-                View recovery pool prices and trading pairs
-              </p>
-
-              <div className="bg-[#151618] border-b border-[#23252A] rounded-lg overflow-hidden mt-4 p-6">
-                <div className="relative">
-                  <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#97979A]" />
-                  <input
-                    type="text"
-                    placeholder="Search pool by pair or address..."
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    className="w-full max-w-lg bg-transparent border border-[#626366] rounded-lg pl-10 pr-4 py-2 text-[#97979A] placeholder-[#97979A] focus:outline-none text-sm md:text-base font-medium"
-                  />
-                </div>
-              </div>
-
-              <div className="bg-[#101012] border border-[#23252A] rounded-lg overflow-hidden mt-4 w-full">
-                <div className="overflow-x-auto">
-                  <div className="min-w-[600px]">
-                    <div
-                      className="grid gap-8 px-6 py-3 bg-[#151618] border-b border-[#23252A] text-[#9798A4] text-sm font-medium"
-                      style={{ gridTemplateColumns: "clamp(60px, 23vw, 320px) clamp(150px, 43vw, 600px) 1fr" }}
-                    >
-                      {poolColumns.map((column) => (
-                        <div key={column.label}>{column.label}</div>
-                      ))}
-                    </div>
-
-                    {currentPools.length > 0 ? (
-                      currentPools.map((pool) => (
-                        <div
-                          key={pool.name}
-                          className="grid gap-8 px-6 py-4 border-b border-[#23252A] items-center"
-                          style={{ gridTemplateColumns: "clamp(60px, 23vw, 320px) clamp(150px, 43vw, 600px) 1fr" }}
-                        >
+                            ) : (
+                              <img
+                                className="flex-shrink-0 w-3 h-3 cursor-pointer"
+                                src="/icons/copy.png"
+                                alt="Copy icon"
+                              />
+                            )}
+                          </button>
                           <a
-                            className="text-white truncate font-semibold text-sm"
-                            href={pool.url}
+                            href={`https://sonicscan.org/address/${pool.address}`}
+                            className="h-6 w-6 flex items-center justify-center text-[#EAECEF]"
+                            target="_blank"
                           >
-                            {pool.pair}
+                            <img
+                              src="/icons/purple_link.png"
+                              alt="external link"
+                              className="w-3 h-3 cursor-pointer"
+                            />
                           </a>
-
-                          <div className="flex items-center gap-2">
-                            <span className="text-[#EAECEF] font-mono text-sm">
-                              {truncateAddress(pool.address)}
-                            </span>
-
-                            <button
-                              onClick={() => handleCopyAddress(pool.address, pool.address)}
-                              className="h-6 w-6 flex items-center justify-center"
-                            >
-                              {copiedId === pool.address ? (<CheckmarkIcon />) : (<CopyIcon />)}
-                            </button>
-
-                            <button
-                              onClick={() => handleExternalLink(pool.address)}
-                              className="h-6 w-6 flex items-center justify-center text-[#EAECEF]"
-                            >
-                              <ExternalLinkIcon />
-                            </button>
-                          </div>
-
-                          <div className="min-w-0">
-                            <PriceCell price={priceCache[pool.address]} />
-                          </div>
                         </div>
-                      ))
-                    ) : (
-                      <div className="px-6 py-12 text-center">
-                        <p className="text-gray-500 text-sm">
-                          No pools found matching "{searchQuery}"
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
 
-                {/* Pagination */}
-                {filteredPools.length > 0 && (
-                  <TablePagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    itemsPerPage={itemsPerPage}
-                    totalItems={filteredPools.length}
-                    startIndex={startIndex}
-                    endIndex={endIndex}
-                    onPageChange={setCurrentPage}
-                    onItemsPerPageChange={setItemsPerPage}
-                  />
-                )}
+                        <div className="min-w-0">
+                          <PriceCell price={priceCache[pool.address]} />
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-6 py-12 text-center">
+                      <p className="text-gray-500 text-sm">
+                        No pools found matching "{searchQuery}"
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
-            </section>
-          </>
-        )}
-      </div>
-    </>
+
+              {filteredPools.length > 0 && (
+                <TablePagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  itemsPerPage={itemsPerPage}
+                  totalItems={filteredPools.length}
+                  startIndex={startIndex}
+                  endIndex={endIndex}
+                  onPageChange={setCurrentPage}
+                  onItemsPerPageChange={setItemsPerPage}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

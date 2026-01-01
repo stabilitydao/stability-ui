@@ -1,6 +1,6 @@
 import { Address } from "viem";
 
-export interface DashboardCardData {
+interface DashboardCardData {
   title: string;
   value: string | number | null;
   subtitle?: string | null;
@@ -9,16 +9,16 @@ export interface DashboardCardData {
   specialType?: string | null;
 }
 
-export type GetPriceReturn = {
+type GetPriceReturn = {
   price_token1_per_token0: number;
   price_token0_per_token1: number;
   sym0: string;
   sym1: string;
 };
 
-export type PriceCache = Record<string, GetPriceReturn>;
+type PriceCache = Record<string, GetPriceReturn>;
 
-export type Token = {
+type Token = {
   name: string;
   symbol: string;
   address: Address;
@@ -26,12 +26,21 @@ export type Token = {
   decimals: number;
 };
 
-export type PriceCellProps = {
+type PriceCellProps = {
   price?: GetPriceReturn | null;
 };
 
-export interface Column {
+interface Column {
   label: string;
   sortable: boolean;
   onSort?: () => void;
 }
+
+export type {
+  Column,
+  PriceCellProps,
+  Token,
+  PriceCache,
+  GetPriceReturn,
+  DashboardCardData,
+};

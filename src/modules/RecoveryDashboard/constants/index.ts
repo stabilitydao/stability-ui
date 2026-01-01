@@ -1,13 +1,12 @@
-// src/modules/RecoveryDashboard/constants/data.ts
-import { Column, DashboardCardData } from "../types";
+import type { Column, DashboardCardData } from "../types";
 
-export const tokenColumns: Column[] = [
+const tokenColumns: Column[] = [
   { label: "Token", sortable: true },
   { label: "Token Address", sortable: false },
   { label: "Recovery Progress", sortable: true },
 ];
 
-export const tokenData = [
+const tokenData = [
   {
     name: "Recovery Stability USD",
     symbol: "RECmetaUSD",
@@ -52,13 +51,13 @@ export const tokenData = [
   },
 ];
 
-export const poolColumns: Column[] = [
+const poolColumns: Column[] = [
   { label: "Pair", sortable: true },
   { label: "Pool Address", sortable: false },
   { label: "Price", sortable: true },
 ];
 
-export const poolData = [
+const poolData = [
   {
     name: "Shadow RECmetaUSD/wmetaUSD",
     url: "https://www.shadow.so/liquidity/manage/0x1e2edba99efd08578460bd9a66f4f521ec861eb9",
@@ -97,7 +96,7 @@ export const poolData = [
   },
 ];
 
-export const dashboardData: DashboardCardData[] = [
+const dashboardData: DashboardCardData[] = [
   {
     title: "Total Tokens",
     value: tokenData.length,
@@ -117,3 +116,5 @@ export const dashboardData: DashboardCardData[] = [
     specialType: null,
   },
 ];
+
+export { tokenColumns, tokenData, poolColumns, poolData, dashboardData };

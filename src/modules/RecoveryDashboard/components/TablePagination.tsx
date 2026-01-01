@@ -1,4 +1,4 @@
-import { BackwardIcon, ForwardIcon } from "../ui/icons";
+import { ArrowIcon } from "@ui";
 
 interface Props {
   currentPage: number;
@@ -11,7 +11,7 @@ interface Props {
   onItemsPerPageChange: (value: number) => void;
 }
 
-export function TablePagination({
+const TablePagination = ({
   currentPage,
   totalPages,
   itemsPerPage,
@@ -20,10 +20,9 @@ export function TablePagination({
   endIndex,
   onPageChange,
   onItemsPerPageChange,
-}: Props): JSX.Element {
+}: Props): JSX.Element => {
   return (
     <div className="flex items-center justify-between text-sm md:px-6 bg-[#151618] border-t border-[#23252A]">
-      {/* Left side - Items per page */}
       <div className="flex items-center gap-2">
         <div className="hidden md:flex items-center gap-2 py-3">
           <span className="text-[#97979A]">Items per page:</span>
@@ -44,8 +43,6 @@ export function TablePagination({
           items
         </span>
       </div>
-
-      {/* Right side - Navigation */}
       <div className="flex items-center gap-2">
         <div className="hidden md:flex items-center gap-2">
           <button
@@ -72,17 +69,19 @@ export function TablePagination({
             disabled={currentPage === 1}
             className="border-r border-l border-[#23252a] py-3 px-4 text-white disabled:text-[#97979A] cursor-pointer disabled:cursor-not-allowed"
           >
-            <BackwardIcon className="w-4 h-4 rotate-90" />
+            <ArrowIcon isActive={currentPage !== 1} rotate={90} />
           </button>
           <button
             onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
             disabled={currentPage === totalPages}
             className="py-3 pr-4 text-white disabled:text-[#97979A] cursor-pointer disabled:cursor-not-allowed"
           >
-            <ForwardIcon className="w-4 h-4 rotate-270" />
+            <ArrowIcon isActive={currentPage !== totalPages} rotate={270} />
           </button>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export { TablePagination };

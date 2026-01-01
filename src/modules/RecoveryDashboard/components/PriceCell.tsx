@@ -1,6 +1,6 @@
 import { PriceCellProps } from "../types";
 
-export const PriceCell: React.FC<PriceCellProps> = ({ price }) => {
+const PriceCell: React.FC<PriceCellProps> = ({ price }) => {
   if (!price) {
     return <div className="text-[#97979A] text-sm">—</div>;
   }
@@ -18,3 +18,5 @@ export const PriceCell: React.FC<PriceCellProps> = ({ price }) => {
     </div>
   );
 };
+
+export { PriceCell };
