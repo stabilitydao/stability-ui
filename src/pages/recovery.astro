@@ -1,0 +1,14 @@
+---
+import Layout from '@layouts/Layout.astro';
+import {RecoveryDashboard} from "@modules"
+---
+
+<Layout
+  title="Recovery Dashboard"
+  img="/ogs/pages/recovery.png"
+  metaTitle="Recovery Dashboard"
+  metaUrl="https://stability.farm/recovery"
+  metaDescription="This page displays all recovery tokens with their burn progress and all recovery pools with their current prices. Recovery Tokens and Recovery Pools are shown as separate sections."
+>
+  <RecoveryDashboard client:only="react"/>
+</Layout>

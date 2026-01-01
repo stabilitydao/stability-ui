@@ -124,6 +124,8 @@ const Breadcrumbs = (): JSX.Element => {
     } else if (main === "builder") {
       add("Platform", "platform");
       add("Builder");
+    } else if (currentPath === "recovery") {
+      add("Recovery Dashboard", "recovery");
     }
 
     setPaths(crumbs);
