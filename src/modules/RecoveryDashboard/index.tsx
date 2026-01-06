@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 
 import { Address, erc20Abi } from "viem";
-import { readContract } from "@wagmi/core";
+import { readContract, readContracts } from "@wagmi/core";
 
 import { TablePagination, PriceCell, Dashboard } from "./components";
 
@@ -18,6 +18,8 @@ import {
 } from "./constants";
 
 import { wagmiConfig, RamsesV3PoolABI } from "@web3";
+
+import { chains } from "@stabilitydao/stability";
 
 import { GetPriceReturn, PriceCache, Token } from "./types";
 
@@ -114,14 +116,34 @@ const RecoveryDashboard = (): JSX.Element => {
   const getBurnProgressOnChain = useCallback(
     async (token: Token): Promise<number> => {
       try {
-        const currentSupply = (await readContract(wagmiConfig, {
-          address: token.address,
-          abi: erc20Abi,
-          functionName: "totalSupply",
-        })) as bigint;
+        const [totalSupplyRes, multisigBalanceRes] = await readContracts(
+          wagmiConfig,
+          {
+            contracts: [
+              {
+                address: token.address,
+                abi: erc20Abi,
+                functionName: "totalSupply",
+              },
+              {
+                address: token.address,
+                abi: erc20Abi,
+                functionName: "balanceOf",
+                args: [chains[146].multisig as Address],
+              },
+            ],
+          }
+        );
 
-        const amountBurnt = token.initialSupply - currentSupply;
-        return Number((amountBurnt * 100000n) / token.initialSupply) / 1000;
+        const initialSupplyRaw = token.initialSupply as bigint;
+        const totalSupplyRaw = totalSupplyRes.result as bigint;
+        const multisigBalanceRaw = multisigBalanceRes.result as bigint;
+
+        const burntRaw = initialSupplyRaw - totalSupplyRaw + multisigBalanceRaw;
+
+        const percent = Number((burntRaw * 100000n) / initialSupplyRaw) / 1000;
+
+        return percent;
       } catch {
         return 0;
       }
