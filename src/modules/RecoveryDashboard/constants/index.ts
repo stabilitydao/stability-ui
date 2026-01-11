@@ -98,19 +98,19 @@ const poolData = [
 
 const dashboardData: DashboardCardData[] = [
   {
-    title: "Total Tokens",
+    title: "Tokens",
     value: tokenData.length,
     subtitle: "Recovery tokens",
     specialType: null,
   },
   {
-    title: "Average Burn Rate",
+    title: "Burn Rate",
     value: null,
     subtitle: null,
     specialType: "averageBurnRate",
   },
   {
-    title: "Total Pools",
+    title: "Pools",
     value: poolData.length,
     subtitle: "Recovery pools",
     specialType: null,
