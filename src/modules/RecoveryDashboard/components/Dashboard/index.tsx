@@ -20,7 +20,7 @@ const Dashboard = ({
           key={index}
           card={card}
           averageBurnRate={averageBurnRate}
-          totalBurnPercent={totalBurnPercent}
+          totalBurnPercent={averageBurnRate}
         />
       ))}
     </div>
