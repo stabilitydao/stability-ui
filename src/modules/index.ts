@@ -30,6 +30,7 @@ import { StabilityBuilder, StabilityOperator } from "./Platform";
 import { DAO } from "./DAO";
 
 import { Season1, Season2 } from "./Seasons";
+import { RecoveryDashboard } from "./RecoveryDashboard";
 
 export {
   Factory,
@@ -65,4 +66,5 @@ export {
   Season1,
   Season2,
   LeverageVault,
+  RecoveryDashboard,
 };

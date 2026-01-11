@@ -2,9 +2,9 @@ import { useEffect } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { formatUnits } from "viem";
+import { formatUnits, erc20Abi, Abi } from "viem";
 
-import { getBalance, getAllowance, getTokenData } from "@utils";
+import { getTokenData } from "@utils";
 
 import { web3clients, AaveProtocolDataProviderABI, AavePoolABI } from "@web3";
 
@@ -76,22 +76,65 @@ export const useUserReservesData = (market: TMarket): TResult => {
         availableBorrowsBase = Number(formatUnits(userData[2], 8));
         liquidationThreshold = Number(userData[3]) / 10000;
       } catch (err) {
-        console.warn("Failed to get availableBorrowsBase:", err);
+        console.warn("Failed to get user account data:", err);
       }
+
+      const contracts = market.reserves.flatMap((asset) => {
+        const address = asset.address as TAddress;
+        const aToken = asset.aToken as TAddress;
+
+        const calls = [
+          {
+            address: aToken,
+            abi: erc20Abi,
+            functionName: "balanceOf",
+            args: [$account],
+          },
+          {
+            address,
+            abi: erc20Abi,
+            functionName: "balanceOf",
+            args: [$account],
+          },
+          {
+            address,
+            abi: erc20Abi,
+            functionName: "allowance",
+            args: [$account, pool],
+          },
+        ];
+
+        if (asset.isBorrowable) {
+          calls.push({
+            address: provider,
+            abi: AaveProtocolDataProviderABI as Abi,
+            functionName: "getUserReserveData",
+            args: [address, $account],
+          });
+        }
+
+        return calls;
+      });
+
+      const results = await client.multicall({
+        contracts,
+        allowFailure: false,
+      });
+
+      let index = 0;
 
       for (const asset of market.reserves) {
         const address = asset.address as TAddress;
-        const aTokenAddress = asset.aToken as TAddress;
-        const priceUSD = Number(asset.price);
         const decimals = getTokenData(address)?.decimals ?? 18;
+        const priceUSD = Number(asset.price);
 
-        const rawATokenBalance = await getBalance(
-          client,
-          aTokenAddress,
-          $account
-        );
+        const rawATokenBalance = results[index++] as bigint;
+        const rawBalance = results[index++] as bigint;
+        const rawAllowance = results[index++] as bigint;
 
         const withdraw = formatUnits(rawATokenBalance, decimals);
+        const balance = formatUnits(rawBalance, decimals);
+        const allowance = formatUnits(rawAllowance, decimals);
 
         let maxWithdraw = "0";
 
@@ -114,7 +157,7 @@ export const useUserReservesData = (market: TMarket): TResult => {
             let _maxWithdraw = withdraw;
 
             if (maxWithdrawTokens < Number(withdraw)) {
-              maxWithdrawTokens *= 0.998999; // * for safe amount
+              maxWithdrawTokens *= 0.998999;
               _maxWithdraw = maxWithdrawTokens.toString();
             }
 
@@ -124,68 +167,38 @@ export const useUserReservesData = (market: TMarket): TResult => {
           }
         }
 
-        const [rawBalance, rawAllowance] = await Promise.all([
-          getBalance(client, address, $account),
-          getAllowance(client, address, $account, pool),
-        ]);
-
-        const balance = formatUnits(rawBalance, decimals);
-        const allowance = formatUnits(rawAllowance, decimals);
-
         const reserveData: any = {
           supply: { balance, allowance },
           withdraw: { balance: withdraw, maxWithdraw },
         };
 
         if (asset.isBorrowable) {
-          const tokenPrice = Number(asset.price);
+          const userReserveData = results[index++] as bigint[];
+          const rawVariableDebt = userReserveData[2];
+
+          const repayBalance = formatUnits(rawVariableDebt, decimals);
+
           let borrow = { balance: "0", maxBorrow: "0" };
 
-          if (availableBorrowsBase > 0 && tokenPrice > 0) {
+          if (availableBorrowsBase > 0 && priceUSD > 0) {
             const rawAmount =
-              (availableBorrowsBase / tokenPrice) * 10 ** decimals;
+              (availableBorrowsBase / priceUSD) * 10 ** decimals;
 
             const safeAmount = BigInt(Math.floor(rawAmount * 0.999999));
-
             const maxBorrow = formatUnits(safeAmount, decimals);
 
-            const availableToBorrow = Number(asset?.availableToBorrow) ?? 0;
-
-            const canBorrow = String(
-              Math.min(availableToBorrow, Number(maxBorrow))
-            );
+            const availableToBorrow = Number(asset.availableToBorrow) || 0;
 
             borrow = {
-              balance: canBorrow,
+              balance: String(Math.min(availableToBorrow, Number(maxBorrow))),
               maxBorrow,
             };
           }
 
           reserveData.borrow = borrow;
-
-          const userReserveData = (await client.readContract({
-            address: provider,
-            abi: AaveProtocolDataProviderABI,
-            functionName: "getUserReserveData",
-            args: [address, $account],
-          })) as bigint[];
-
-          const rawVariableDebt = userReserveData[2];
-
-          const repayBalance = formatUnits(rawVariableDebt, decimals);
-
-          const rawRepayAllowance = await getAllowance(
-            client,
-            address,
-            $account,
-            pool
-          );
-
-          const repayAllowance = formatUnits(rawRepayAllowance, decimals);
-
           reserveData.repay = {
             balance: repayBalance,
-            allowance: repayAllowance,
+            allowance,
           };
         }
 
