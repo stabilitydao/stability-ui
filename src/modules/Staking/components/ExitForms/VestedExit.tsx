@@ -12,9 +12,9 @@ import { VestingTimeline, Timer } from "../../ui";
 
 import { getTransactionReceipt, formatNumber, cn } from "@utils";
 
-import { sonicClient, ERC20ABI, wagmiConfig, IXSTBLABI } from "@web3";
+import { web3clients, ERC20ABI, wagmiConfig, IXSTBLABI } from "@web3";
 
-import { account, connected, lastTx } from "@store";
+import { account, connected, lastTx, stakeNetwork } from "@store";
 
 import { STABILITY_TOKENS } from "@constants";
 
@@ -26,6 +26,9 @@ const VestedExit: React.FC = () => {
   const $connected = useStore(connected);
   const $account = useStore(account);
   const $lastTx = useStore(lastTx);
+  const $stakeNetwork = useStore(stakeNetwork);
+
+  const client = web3clients[$stakeNetwork?.id as keyof typeof web3clients];
 
   const stabilityDAO = daos?.find(({ name }) => name === "Stability");
 
@@ -130,7 +133,7 @@ const VestedExit: React.FC = () => {
       const vestID = activeVest.id - 1;
 
       const convertSTBL = await writeContract(wagmiConfig, {
-        address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+        address: STABILITY_TOKENS[$stakeNetwork?.id].xstbl.address as TAddress,
         abi: IXSTBLABI,
         functionName: "exitVest",
         args: [vestID],
@@ -153,7 +156,7 @@ const VestedExit: React.FC = () => {
 
   const vest = async () => {
     setTransactionInProgress(true);
-    const decimals = STABILITY_TOKENS[146].stbl.decimals;
+    const decimals = STABILITY_TOKENS[$stakeNetwork?.id].stbl.decimals;
 
     const amount = Number(input?.current?.value);
 
@@ -162,7 +165,7 @@ const VestedExit: React.FC = () => {
     try {
       setNeedConfirm(true);
       const convertSTBL = await writeContract(wagmiConfig, {
-        address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+        address: STABILITY_TOKENS[$stakeNetwork?.id].xstbl.address as TAddress,
         abi: IXSTBLABI,
         functionName: "createVest",
         args: [value],
@@ -186,15 +189,15 @@ const VestedExit: React.FC = () => {
 
   const getData = async () => {
     try {
-      const XSTBLBalance = await sonicClient.readContract({
-        address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+      const XSTBLBalance = await client.readContract({
+        address: STABILITY_TOKENS[$stakeNetwork?.id].xstbl.address as TAddress,
         abi: ERC20ABI,
         functionName: "balanceOf",
         args: [$account as TAddress],
       });
 
-      const userTotalVests = await sonicClient.readContract({
-        address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+      const userTotalVests = await client.readContract({
+        address: STABILITY_TOKENS[$stakeNetwork?.id].xstbl.address as TAddress,
         abi: IXSTBLABI,
         functionName: "usersTotalVests",
         args: [$account as TAddress],
@@ -203,8 +206,9 @@ const VestedExit: React.FC = () => {
       const userVests = [];
 
       for (let i = 0; i < Number(userTotalVests); i++) {
-        const vestInfo = (await sonicClient.readContract({
-          address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+        const vestInfo = (await client.readContract({
+          address: STABILITY_TOKENS[$stakeNetwork?.id].xstbl
+            .address as TAddress,
           abi: IXSTBLABI,
           functionName: "vestInfo",
           args: [$account as TAddress, i],
@@ -214,7 +218,7 @@ const VestedExit: React.FC = () => {
           let amount = Number(
             formatUnits(
               vestInfo?.[0] as bigint,
-              STABILITY_TOKENS[146].xstbl.decimals
+              STABILITY_TOKENS[$stakeNetwork?.id].xstbl.decimals
             )
           );
 
@@ -230,7 +234,7 @@ const VestedExit: React.FC = () => {
 
       let parsedBalance = formatUnits(
         XSTBLBalance,
-        STABILITY_TOKENS[146].xstbl.decimals
+        STABILITY_TOKENS[$stakeNetwork?.id].xstbl.decimals
       );
 
       setBalance(parsedBalance);
@@ -245,7 +249,7 @@ const VestedExit: React.FC = () => {
     if ($account) {
       getData();
     }
-  }, [$account, $lastTx]);
+  }, [$account, $lastTx, $stakeNetwork]);
 
   return (
     <div className="bg-[#101012] border border-[#23252A] p-6 rounded-lg flex justify-between flex-col gap-6 lg:w-[70%]">
@@ -420,6 +424,7 @@ const VestedExit: React.FC = () => {
 
         <ActionButton
           type={button}
+          network={$stakeNetwork?.id}
           transactionInProgress={transactionInProgress}
           needConfirm={needConfirm}
           actionFunction={vestFunctionHandler}

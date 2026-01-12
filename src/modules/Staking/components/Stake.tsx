@@ -10,9 +10,15 @@ import { ActionButton } from "@ui";
 
 import { formatNumber, getTransactionReceipt, cn } from "@utils";
 
-import { connected, account, lastTx } from "@store";
+import { connected, account, lastTx, stakeNetwork } from "@store";
 
-import { sonicClient, ERC20ABI, wagmiConfig, IXStakingABI } from "@web3";
+import {
+  ERC20ABI,
+  wagmiConfig,
+  IXStakingABI,
+  stakingContracts,
+  web3clients,
+} from "@web3";
 
 import { STABILITY_TOKENS } from "@constants";
 
@@ -22,6 +28,7 @@ const Stake = (): JSX.Element => {
   const $connected = useStore(connected);
   const $account = useStore(account);
   const $lastTx = useStore(lastTx);
+  const $stakeNetwork = useStore(stakeNetwork);
 
   const input = useRef<HTMLInputElement>(null);
 
@@ -42,8 +49,9 @@ const Stake = (): JSX.Element => {
 
   const [stakeType, setStakeType] = useState("Stake");
 
-  const STAKING_CONTRACT: TAddress =
-    "0x17a7cf838a7c91de47552a9f65822b547f9a6997";
+  const client = web3clients[$stakeNetwork?.id as keyof typeof web3clients];
+
+  const STAKING_CONTRACT: TAddress = stakingContracts[$stakeNetwork?.id];
 
   const handleInputChange = (type = "") => {
     let numericValue = input?.current?.value.replace(/[^0-9.]/g, "");
@@ -90,9 +98,9 @@ const Stake = (): JSX.Element => {
   const approve = async () => {
     setTransactionInProgress(true);
 
-    const xSTBL = STABILITY_TOKENS[146].xstbl.address as TAddress;
+    const xSTBL = STABILITY_TOKENS[$stakeNetwork?.id].xstbl.address as TAddress;
 
-    const decimals = STABILITY_TOKENS[146].stbl.decimals;
+    const decimals = STABILITY_TOKENS[$stakeNetwork?.id].stbl.decimals;
 
     const amount = Number(input?.current?.value);
 
@@ -114,15 +122,19 @@ const Stake = (): JSX.Element => {
         if (transaction?.status === "success") {
           lastTx.set(transaction?.transactionHash);
 
-          const newAllowance = await sonicClient.readContract({
-            address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+          const newAllowance = await client.readContract({
+            address: STABILITY_TOKENS[$stakeNetwork?.id].xstbl
+              .address as TAddress,
             abi: ERC20ABI,
             functionName: "allowance",
             args: [$account as TAddress, STAKING_CONTRACT as TAddress],
           });
 
           let parsedAllowance = Number(
-            formatUnits(newAllowance, STABILITY_TOKENS[146].xstbl.decimals)
+            formatUnits(
+              newAllowance,
+              STABILITY_TOKENS[$stakeNetwork?.id].xstbl.decimals
+            )
           );
 
           setAllowance(parsedAllowance);
@@ -133,15 +145,19 @@ const Stake = (): JSX.Element => {
         }
       } catch (error) {
         setNeedConfirm(false);
-        const newAllowance = await sonicClient.readContract({
-          address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+        const newAllowance = await client.readContract({
+          address: STABILITY_TOKENS[$stakeNetwork?.id].xstbl
+            .address as TAddress,
           abi: ERC20ABI,
           functionName: "allowance",
           args: [$account as TAddress, STAKING_CONTRACT as TAddress],
         });
 
         let parsedAllowance = Number(
-          formatUnits(newAllowance, STABILITY_TOKENS[146].xstbl.decimals)
+          formatUnits(
+            newAllowance,
+            STABILITY_TOKENS[$stakeNetwork?.id].xstbl.decimals
+          )
         );
 
         setAllowance(parsedAllowance);
@@ -158,7 +174,7 @@ const Stake = (): JSX.Element => {
 
   const stakeAction = async (type: string) => {
     setTransactionInProgress(true);
-    const decimals = STABILITY_TOKENS[146].xstbl.decimals;
+    const decimals = STABILITY_TOKENS[$stakeNetwork?.id].xstbl.decimals;
 
     const amount = Number(input?.current?.value);
 
@@ -250,8 +266,9 @@ const Stake = (): JSX.Element => {
 
       if ($account) {
         try {
-          const XSTBLBalance = await sonicClient.readContract({
-            address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+          const XSTBLBalance = await client.readContract({
+            address: STABILITY_TOKENS[$stakeNetwork?.id].xstbl
+              .address as TAddress,
             abi: ERC20ABI,
             functionName: "balanceOf",
             args: [$account],
@@ -259,14 +276,14 @@ const Stake = (): JSX.Element => {
 
           _balances.xstbl = formatUnits(
             XSTBLBalance,
-            STABILITY_TOKENS[146].xstbl.decimals
+            STABILITY_TOKENS[$stakeNetwork?.id].xstbl.decimals
           );
         } catch (err) {
           console.error("Error: XSTBL balance", err);
         }
 
         try {
-          const stakedSTBLBalance = await sonicClient.readContract({
+          const stakedSTBLBalance = await client.readContract({
             address: STAKING_CONTRACT,
             abi: IXStakingABI,
             functionName: "balanceOf",
@@ -275,7 +292,7 @@ const Stake = (): JSX.Element => {
 
           const parsedStaked = formatUnits(
             stakedSTBLBalance as bigint,
-            STABILITY_TOKENS[146].xstbl.decimals
+            STABILITY_TOKENS[$stakeNetwork?.id].xstbl.decimals
           );
 
           _balances.stakedXSTBL = parsedStaked;
@@ -284,7 +301,7 @@ const Stake = (): JSX.Element => {
         }
 
         try {
-          const earned = await sonicClient.readContract({
+          const earned = await client.readContract({
             address: STAKING_CONTRACT,
             abi: IXStakingABI,
             functionName: "earned",
@@ -293,7 +310,7 @@ const Stake = (): JSX.Element => {
 
           const parsedEarned = formatUnits(
             earned,
-            STABILITY_TOKENS[146].xstbl.decimals
+            STABILITY_TOKENS[$stakeNetwork?.id].xstbl.decimals
           );
           _balances.earned = parsedEarned;
           setIsClaimable(!!Number(parsedEarned));
@@ -302,8 +319,9 @@ const Stake = (): JSX.Element => {
         }
 
         try {
-          const stakedSTBLAllowance = await sonicClient.readContract({
-            address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+          const stakedSTBLAllowance = await client.readContract({
+            address: STABILITY_TOKENS[$stakeNetwork?.id].xstbl
+              .address as TAddress,
             abi: ERC20ABI,
             functionName: "allowance",
             args: [$account, STAKING_CONTRACT],
@@ -312,7 +330,9 @@ const Stake = (): JSX.Element => {
           const parsedAllowance = Number(
             formatUnits(
               stakedSTBLAllowance,
-              STABILITY_TOKENS[146].xstbl.decimals
+              STABILITY_TOKENS[
+                $stakeNetwork?.id as keyof typeof STABILITY_TOKENS
+              ].xstbl.decimals
             )
           );
 
@@ -330,7 +350,7 @@ const Stake = (): JSX.Element => {
 
   useEffect(() => {
     getData();
-  }, [$account, $lastTx]);
+  }, [$account, $lastTx, $stakeNetwork]);
 
   return (
     <div className="bg-[#101012] border border-[#23252A] p-6 rounded-lg flex justify-between flex-col md:flex-row">
@@ -433,6 +453,7 @@ const Stake = (): JSX.Element => {
 
         <ActionButton
           type={button}
+          network={$stakeNetwork?.id}
           transactionInProgress={transactionInProgress}
           needConfirm={needConfirm}
           actionFunction={stakeHandler}

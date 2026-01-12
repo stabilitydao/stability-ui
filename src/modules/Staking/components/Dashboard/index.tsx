@@ -16,14 +16,16 @@ import { formatNumber, useStakingData } from "@utils";
 
 import { STABILITY_TOKENS } from "@constants";
 
-import { account, assetsPrices, connected, lastTx } from "@store";
+import { account, assetsPrices, connected, lastTx, stakeNetwork } from "@store";
 
 import {
-  sonicClient,
+  web3clients,
   ERC20ABI,
   IXStakingABI,
   IXSTBLABI,
   IRevenueRouterABI,
+  stakingContracts,
+  revenueRouters,
 } from "@web3";
 
 import type { TStakeDashboard, TAddress } from "@types";
@@ -33,6 +35,9 @@ const Dashboard = (): JSX.Element => {
   const $account = useStore(account);
   const $assetsPrices = useStore(assetsPrices);
   const $lastTx = useStore(lastTx);
+  const $stakeNetwork = useStore(stakeNetwork);
+
+  const client = web3clients[$stakeNetwork?.id as keyof typeof web3clients];
 
   const { data: stakingData, isLoading: isStakingDataLoading } =
     useStakingData();
@@ -41,11 +46,9 @@ const Dashboard = (): JSX.Element => {
 
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const STAKING_CONTRACT: TAddress =
-    "0x17a7cf838a7c91de47552a9f65822b547f9a6997";
+  const STAKING_CONTRACT: TAddress = stakingContracts[$stakeNetwork?.id];
 
-  const REVENUE_ROUTER_CONTRACT: TAddress =
-    "0x23b8cc22c4c82545f4b451b11e2f17747a730810";
+  const REVENUE_ROUTER_CONTRACT: TAddress = revenueRouters[$stakeNetwork?.id];
 
   const [dashboard, setDashboard] = useState<TStakeDashboard>({
     totalStaked: 0,
@@ -95,7 +98,7 @@ const Dashboard = (): JSX.Element => {
       let lendingPendingRevenue = BigInt(0);
 
       try {
-        _totalStaked = (await sonicClient.readContract({
+        _totalStaked = (await client.readContract({
           address: STAKING_CONTRACT,
           abi: IXStakingABI,
           functionName: "totalSupply",
@@ -105,8 +108,9 @@ const Dashboard = (): JSX.Element => {
       }
 
       try {
-        pendingRebase = (await sonicClient.readContract({
-          address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+        pendingRebase = (await client.readContract({
+          address: STABILITY_TOKENS[$stakeNetwork?.id].xstbl
+            .address as TAddress,
           abi: IXSTBLABI,
           functionName: "pendingRebase",
         })) as bigint;
@@ -115,7 +119,7 @@ const Dashboard = (): JSX.Element => {
       }
 
       try {
-        pendingRevenue = (await sonicClient.readContract({
+        pendingRevenue = (await client.readContract({
           address: REVENUE_ROUTER_CONTRACT,
           abi: IRevenueRouterABI,
           functionName: "pendingRevenue",
@@ -125,7 +129,7 @@ const Dashboard = (): JSX.Element => {
       }
 
       try {
-        lendingPendingRevenue = (await sonicClient.readContract({
+        lendingPendingRevenue = (await client.readContract({
           address: REVENUE_ROUTER_CONTRACT,
           abi: IRevenueRouterABI,
           functionName: "pendingRevenue",
@@ -147,8 +151,9 @@ const Dashboard = (): JSX.Element => {
 
       const stblPrice =
         Number(
-          $assetsPrices[146][STABILITY_TOKENS[146].stbl.address.toLowerCase()]
-            ?.price
+          $assetsPrices[$stakeNetwork?.id][
+            STABILITY_TOKENS[$stakeNetwork?.id].stbl.address.toLowerCase()
+          ]?.price
         ) || 0;
 
       _dashboardData.timestamp =
@@ -182,8 +187,9 @@ const Dashboard = (): JSX.Element => {
 
       if ($account) {
         try {
-          const XSTBLBalance = await sonicClient.readContract({
-            address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+          const XSTBLBalance = await client.readContract({
+            address: STABILITY_TOKENS[$stakeNetwork?.id].xstbl
+              .address as TAddress,
             abi: ERC20ABI,
             functionName: "balanceOf",
             args: [$account],
@@ -191,14 +197,14 @@ const Dashboard = (): JSX.Element => {
 
           _balances.xstbl = formatUnits(
             XSTBLBalance,
-            STABILITY_TOKENS[146].xstbl.decimals
+            STABILITY_TOKENS[$stakeNetwork?.id].xstbl.decimals
           );
         } catch (err) {
           console.error("Error: XSTBL balance", err);
         }
 
         try {
-          const stakedSTBLBalance = await sonicClient.readContract({
+          const stakedSTBLBalance = await client.readContract({
             address: STAKING_CONTRACT,
             abi: IXStakingABI,
             functionName: "balanceOf",
@@ -207,7 +213,7 @@ const Dashboard = (): JSX.Element => {
 
           const parsedStaked = formatUnits(
             stakedSTBLBalance as bigint,
-            STABILITY_TOKENS[146].xstbl.decimals
+            STABILITY_TOKENS[$stakeNetwork?.id].xstbl.decimals
           );
 
           _balances.stakedXSTBL = parsedStaked;
@@ -234,7 +240,7 @@ const Dashboard = (): JSX.Element => {
     if (Object.keys($assetsPrices).length) {
       getData();
     }
-  }, [$account, $lastTx, $assetsPrices]);
+  }, [$account, $lastTx, $assetsPrices, $stakeNetwork]);
 
   return (
     <div className="flex flex-col gap-[28px]">

@@ -57,6 +57,18 @@ const STABILITY_TOKENS = {
       decimals: 18,
     },
   },
+  9745: {
+    stbl: {
+      address: "0xfdf91362B7E9330F232e500c0236a02B0DE3e492",
+      symbol: "STBL",
+      decimals: 18,
+    },
+    xstbl: {
+      address: "0xF40D0724599282CaF9dfb66feB630e936bC0CFBE",
+      symbl: "xSTBL",
+      decimals: 18,
+    },
+  },
 };
 
 export {

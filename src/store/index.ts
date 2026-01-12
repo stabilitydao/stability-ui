@@ -5,7 +5,11 @@ import { QueryClient } from "@tanstack/react-query";
 
 import { deserialize, serialize } from "wagmi";
 
-import { DEFAULT_ERROR, DEFAULT_TRANSACTION_SETTINGS } from "@constants";
+import {
+  CHAINS,
+  DEFAULT_ERROR,
+  DEFAULT_TRANSACTION_SETTINGS,
+} from "@constants";
 
 import type {
   TPlatformData,
@@ -58,6 +62,8 @@ const isWeb3Load = atom<boolean>(true);
 const currentChainID = atom();
 
 const stakingData = atom<TStakingData | undefined>(undefined);
+
+const stakeNetwork = atom(CHAINS[1]);
 
 // deepMaps
 
@@ -132,4 +138,5 @@ export {
   userReservesLoading,
   stakingData,
   metaVaultsUsers,
+  stakeNetwork,
 };

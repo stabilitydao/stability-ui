@@ -10,9 +10,9 @@ import { ActionButton } from "@ui";
 
 import { getTransactionReceipt, cn } from "@utils";
 
-import { connected, account, lastTx } from "@store";
+import { connected, account, lastTx, stakeNetwork } from "@store";
 
-import { sonicClient, ERC20ABI, IXSTBLABI, wagmiConfig } from "@web3";
+import { web3clients, ERC20ABI, IXSTBLABI, wagmiConfig } from "@web3";
 
 import { STABILITY_TOKENS } from "@constants";
 
@@ -24,6 +24,9 @@ const InstantExit: React.FC = () => {
   const $connected = useStore(connected);
   const $account = useStore(account);
   const $lastTx = useStore(lastTx);
+  const $stakeNetwork = useStore(stakeNetwork);
+
+  const client = web3clients[$stakeNetwork?.id as keyof typeof web3clients];
 
   const stabilityDAO = daos?.find(({ name }) => name === "Stability");
 
@@ -64,8 +67,8 @@ const InstantExit: React.FC = () => {
 
   const getData = async () => {
     try {
-      const XSTBLBalance = await sonicClient.readContract({
-        address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+      const XSTBLBalance = await client.readContract({
+        address: STABILITY_TOKENS[$stakeNetwork?.id].xstbl.address as TAddress,
         abi: ERC20ABI,
         functionName: "balanceOf",
         args: [$account as TAddress],
@@ -73,7 +76,7 @@ const InstantExit: React.FC = () => {
 
       let parsedBalance = formatUnits(
         XSTBLBalance,
-        STABILITY_TOKENS[146].xstbl.decimals
+        STABILITY_TOKENS[$stakeNetwork?.id].xstbl.decimals
       );
 
       if (parsedBalance) {
@@ -86,7 +89,7 @@ const InstantExit: React.FC = () => {
 
   const exit = async () => {
     setTransactionInProgress(true);
-    const decimals = STABILITY_TOKENS[146].xstbl.decimals;
+    const decimals = STABILITY_TOKENS[$stakeNetwork?.id].xstbl.decimals;
 
     const amount = Number(input?.current?.value);
 
@@ -95,7 +98,7 @@ const InstantExit: React.FC = () => {
     try {
       setNeedConfirm(true);
       const exitSTBL = await writeContract(wagmiConfig, {
-        address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+        address: STABILITY_TOKENS[$stakeNetwork?.id].xstbl.address as TAddress,
         abi: IXSTBLABI,
         functionName: "exit",
         args: [value],
@@ -121,7 +124,7 @@ const InstantExit: React.FC = () => {
     if ($account) {
       getData();
     }
-  }, [$account, $lastTx]);
+  }, [$account, $lastTx, $stakeNetwork]);
 
   return (
     <div className="bg-[#101012] border border-[#23252A] p-6 rounded-lg flex justify-between flex-col lg:w-1/3">
@@ -168,6 +171,7 @@ const InstantExit: React.FC = () => {
 
         <ActionButton
           type={button}
+          network={$stakeNetwork?.id}
           transactionInProgress={transactionInProgress}
           needConfirm={needConfirm}
           actionFunction={exit}
