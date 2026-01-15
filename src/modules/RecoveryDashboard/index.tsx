@@ -305,7 +305,7 @@ const RecoveryDashboard = (): JSX.Element => {
           <Dashboard
             cards={dashboardData}
             averageBurnRate={averageBurnRate}
-            totalBurnPercent={totalBurnPercent}
+            // totalBurnPercent={totalBurnPercent}
           />
         )}
       </div>
