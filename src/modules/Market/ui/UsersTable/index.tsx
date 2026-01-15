@@ -66,7 +66,7 @@ const UsersTable: React.FC<TProps> = ({
 
       case "Liquidation Price":
         return user.liquidationPrice
-          ? formatNumber(user.liquidationPrice, "format")
+          ? formatNumber(user.liquidationPrice, "formatWithLongDecimalPart")
           : "";
 
       case "LTV":
