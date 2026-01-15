@@ -4,7 +4,7 @@ import { createWalletClient, http, createPublicClient } from "viem";
 
 import { mainnet, avalanche, sonic, plasma } from "viem/chains";
 
-import { deployments } from "@stabilitydao/stability";
+import { deployments, daos } from "@stabilitydao/stability";
 
 import ERC20ABI from "./abi/ERC20ABI.ts";
 import ERC20MetadataUpgradeableABI from "./abi/ERC20MetadataUpgradeableABI.ts";
@@ -34,6 +34,8 @@ import type { TAddress } from "@types";
 const CONTRACT_PAGINATION = 20;
 
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
+
+const stabilityDAO = daos?.find(({ name }) => name === "Stability");
 
 const platforms: { [key: string]: TAddress } = Object.entries(
   deployments
@@ -77,6 +79,30 @@ const factories: { [key: string]: TAddress } = Object.entries(
   (acc, [key, value]) => {
     if (value?.core?.factory) {
       acc[key] = value?.core?.factory;
+    }
+    return acc;
+  },
+  {} as { [key: string]: TAddress }
+);
+
+const stakingContracts: { [key: string]: TAddress } = Object.entries(
+  stabilityDAO?.deployments ?? {}
+).reduce(
+  (acc, [key, value]) => {
+    if (value?.staking) {
+      acc[key] = value?.staking;
+    }
+    return acc;
+  },
+  {} as { [key: string]: TAddress }
+);
+
+const revenueRouters: { [key: string]: TAddress } = Object.entries(
+  stabilityDAO?.deployments ?? {}
+).reduce(
+  (acc, [key, value]) => {
+    if (value?.revenueRouter) {
+      acc[key] = value?.revenueRouter;
     }
     return acc;
   },
@@ -168,4 +194,6 @@ export {
   StabilityDAOABI,
   VestingABI,
   RamsesV3PoolABI,
+  stakingContracts,
+  revenueRouters,
 };

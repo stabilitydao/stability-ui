@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import WagmiLayout from "@layouts/WagmiLayout";
 
+import { chains } from "@stabilitydao/stability";
+
 import {
   ConvertForm,
   ExitForms,
@@ -13,8 +15,41 @@ import {
 
 import { cn } from "@utils";
 
+import { stakeNetwork } from "@store";
+
+const TEMP_CHAINS = [
+  {
+    name: chains["146"].name,
+    id: "146",
+    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["146"].img}`,
+    explorer: "https://sonicscan.org",
+    nativeCurrency: "S",
+    color: "#000000",
+    active: true,
+  },
+  {
+    name: chains["9745"].name,
+    id: "9745",
+    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["9745"].img}`,
+    explorer: "https://plasmascan.to",
+    nativeCurrency: "XPL",
+    color: "#15322A",
+    active: true,
+  },
+];
+
 const Staking = (): JSX.Element => {
   const [activeForm, setActiveForm] = useState("stake"); // stake, convert, vest, exit
+
+  const [activeNetwork, setActiveNetwork] = useState(TEMP_CHAINS[0]);
+
+  const networksHandler = (chainId: string) => {
+    const network =
+      TEMP_CHAINS.find(({ id }) => id === chainId) ?? TEMP_CHAINS[0];
+
+    stakeNetwork.set(network);
+    setActiveNetwork(network);
+  };
 
   return (
     <WagmiLayout>
@@ -65,45 +100,31 @@ const Staking = (): JSX.Element => {
           </div>
         </div>
 
-        {/* <div className="flex items-center justify-between gap-6 flex-wrap lg:flex-nowrap">
-          <div className="w-full bg-[#101012] rounded-lg border border-[#23252A]">
-            <div className="py-6 flex items-center flex-col gap-1">
-              <span className="text-[#97979A] text-[16px] leading-6 font-medium">
-                Pending APR
-              </span>
-              <span className="text-[#48C05C] text-[40px] leading-[48px] font-semibold">
-                +12.06%
-              </span>
+        <div className="flex items-center gap-2 select-none">
+          {TEMP_CHAINS.map((chain) => (
+            <div
+              className={`flex items-center justify-center cursor-pointer px-3 py-2 border h-[48px] rounded-lg ${
+                chain.id === activeNetwork.id
+                  ? "bg-[#22242A] border-[#35363B]"
+                  : "border-[#23252A]"
+              }`}
+              key={chain.name + chain.id}
+              title={chain.name}
+              onClick={() => networksHandler(chain.id)}
+            >
+              <div className="flex items-center gap-2">
+                <img
+                  className="h-5 w-5 rounded-full"
+                  src={chain.logoURI}
+                  alt={chain.name}
+                />
+                <span className="text-[14px] leading-5 font-medium">
+                  {chain.name}
+                </span>
+              </div>
             </div>
-          </div>
-          <div className="w-full bg-[#101012] rounded-lg border border-[#23252A]">
-            <div className="py-6 flex items-center flex-col gap-1">
-              <span className="text-[#97979A] text-[16px] leading-6 font-medium">
-                Total xSTBL
-              </span>
-              <span className="text-[40px] leading-[48px] font-semibold">
-                773,242.06
-              </span>
-            </div>
-          </div>
-          <div className="w-full bg-[#101012] rounded-lg border border-[#23252A]">
-            <div className="py-6 flex items-center flex-col gap-1">
-              <span className="text-[#97979A] text-[16px] leading-6 font-medium">
-                Total xSTBL, $
-              </span>
-              <span className="text-[40px] leading-[48px] font-semibold">
-                $46,464.12
-              </span>
-            </div>
-          </div>
+          ))}
         </div>
-
-        <div className="flex flex-col gap-4">
-          <h3 className="text-[24px] leading-8 font-semibold">
-            Generating units
-          </h3>
-          <div></div>
-        </div> */}
 
         <div className="hidden lg:block">
           <Stake />

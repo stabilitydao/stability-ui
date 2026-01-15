@@ -5,13 +5,13 @@ import type { DashboardCardData } from "../../types";
 interface IProps {
   cards: DashboardCardData[];
   averageBurnRate: number | null;
-  totalBurnPercent: number | null;
+  // totalBurnPercent: number | null;
 }
 
 const Dashboard = ({
   cards,
   averageBurnRate,
-  totalBurnPercent,
+  // totalBurnPercent,
 }: IProps): JSX.Element => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">

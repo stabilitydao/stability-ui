@@ -10,9 +10,9 @@ import { ActionButton } from "@ui";
 
 import { getTransactionReceipt, cn } from "@utils";
 
-import { sonicClient, ERC20ABI, IXSTBLABI, wagmiConfig } from "@web3";
+import { web3clients, ERC20ABI, IXSTBLABI, wagmiConfig } from "@web3";
 
-import { connected, account, lastTx } from "@store";
+import { connected, account, lastTx, stakeNetwork } from "@store";
 
 import { STABILITY_TOKENS } from "@constants";
 
@@ -22,6 +22,7 @@ const ConvertForm = (): JSX.Element => {
   const $connected = useStore(connected);
   const $account = useStore(account);
   const $lastTx = useStore(lastTx);
+  const $stakeNetwork = useStore(stakeNetwork);
 
   const input = useRef<HTMLInputElement>(null);
 
@@ -32,6 +33,8 @@ const ConvertForm = (): JSX.Element => {
 
   const [transactionInProgress, setTransactionInProgress] = useState(false);
   const [needConfirm, setNeedConfirm] = useState(false);
+
+  const client = web3clients[$stakeNetwork?.id as keyof typeof web3clients];
 
   const handleInputChange = (type = "") => {
     let numericValue = input?.current?.value.replace(/[^0-9.]/g, "");
@@ -63,30 +66,33 @@ const ConvertForm = (): JSX.Element => {
 
   const getData = async () => {
     try {
-      const STBLBalance = await sonicClient.readContract({
-        address: STABILITY_TOKENS[146].stbl.address as TAddress,
+      const STBLBalance = await client.readContract({
+        address: STABILITY_TOKENS[$stakeNetwork?.id].stbl.address as TAddress,
         abi: ERC20ABI,
         functionName: "balanceOf",
         args: [$account as TAddress],
       });
 
-      const STBLAllowance = await sonicClient.readContract({
-        address: STABILITY_TOKENS[146].stbl.address as TAddress,
+      const STBLAllowance = await client.readContract({
+        address: STABILITY_TOKENS[$stakeNetwork?.id].stbl.address as TAddress,
         abi: ERC20ABI,
         functionName: "allowance",
         args: [
           $account as TAddress,
-          STABILITY_TOKENS[146].xstbl.address as TAddress,
+          STABILITY_TOKENS[$stakeNetwork?.id].xstbl.address as TAddress,
         ],
       });
 
       let parsedBalance = formatUnits(
         STBLBalance,
-        STABILITY_TOKENS[146].stbl.decimals
+        STABILITY_TOKENS[$stakeNetwork?.id].stbl.decimals
       );
 
       let parsedAllowance = Number(
-        formatUnits(STBLAllowance, STABILITY_TOKENS[146].xstbl.decimals)
+        formatUnits(
+          STBLAllowance,
+          STABILITY_TOKENS[$stakeNetwork?.id].xstbl.decimals
+        )
       );
 
       if (parsedBalance) {
@@ -113,10 +119,10 @@ const ConvertForm = (): JSX.Element => {
   const approve = async () => {
     setTransactionInProgress(true);
 
-    const STBL = STABILITY_TOKENS[146].stbl.address as TAddress;
-    const xSTBL = STABILITY_TOKENS[146].xstbl.address as TAddress;
+    const STBL = STABILITY_TOKENS[$stakeNetwork?.id].stbl.address as TAddress;
+    const xSTBL = STABILITY_TOKENS[$stakeNetwork?.id].xstbl.address as TAddress;
 
-    const decimals = STABILITY_TOKENS[146].stbl.decimals;
+    const decimals = STABILITY_TOKENS[$stakeNetwork?.id].stbl.decimals;
 
     const amount = Number(input?.current?.value);
 
@@ -138,18 +144,22 @@ const ConvertForm = (): JSX.Element => {
         if (transaction?.status === "success") {
           lastTx.set(transaction?.transactionHash);
 
-          const newAllowance = await sonicClient.readContract({
-            address: STABILITY_TOKENS[146].stbl.address as TAddress,
+          const newAllowance = await client.readContract({
+            address: STABILITY_TOKENS[$stakeNetwork?.id].stbl
+              .address as TAddress,
             abi: ERC20ABI,
             functionName: "allowance",
             args: [
               $account as TAddress,
-              STABILITY_TOKENS[146].xstbl.address as TAddress,
+              STABILITY_TOKENS[$stakeNetwork?.id].xstbl.address as TAddress,
             ],
           });
 
           let parsedAllowance = Number(
-            formatUnits(newAllowance, STABILITY_TOKENS[146].xstbl.decimals)
+            formatUnits(
+              newAllowance,
+              STABILITY_TOKENS[$stakeNetwork?.id].xstbl.decimals
+            )
           );
 
           setAllowance(parsedAllowance);
@@ -160,18 +170,21 @@ const ConvertForm = (): JSX.Element => {
         }
       } catch (error) {
         setNeedConfirm(false);
-        const newAllowance = await sonicClient.readContract({
-          address: STABILITY_TOKENS[146].stbl.address as TAddress,
+        const newAllowance = await client.readContract({
+          address: STABILITY_TOKENS[$stakeNetwork?.id].stbl.address as TAddress,
           abi: ERC20ABI,
           functionName: "allowance",
           args: [
             $account as TAddress,
-            STABILITY_TOKENS[146].xstbl.address as TAddress,
+            STABILITY_TOKENS[$stakeNetwork?.id].xstbl.address as TAddress,
           ],
         });
 
         let parsedAllowance = Number(
-          formatUnits(newAllowance, STABILITY_TOKENS[146].xstbl.decimals)
+          formatUnits(
+            newAllowance,
+            STABILITY_TOKENS[$stakeNetwork?.id].xstbl.decimals
+          )
         );
 
         setAllowance(parsedAllowance);
@@ -187,7 +200,7 @@ const ConvertForm = (): JSX.Element => {
 
   const convert = async () => {
     setTransactionInProgress(true);
-    const decimals = STABILITY_TOKENS[146].stbl.decimals;
+    const decimals = STABILITY_TOKENS[$stakeNetwork?.id].stbl.decimals;
 
     const amount = Number(input?.current?.value);
 
@@ -196,7 +209,7 @@ const ConvertForm = (): JSX.Element => {
     try {
       setNeedConfirm(true);
       const convertSTBL = await writeContract(wagmiConfig, {
-        address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+        address: STABILITY_TOKENS[$stakeNetwork?.id].xstbl.address as TAddress,
         abi: IXSTBLABI,
         functionName: "enter",
         args: [value],
@@ -222,7 +235,7 @@ const ConvertForm = (): JSX.Element => {
     if ($account) {
       getData();
     }
-  }, [$account, $lastTx]);
+  }, [$account, $lastTx, $stakeNetwork]);
 
   return (
     <div className="bg-[#101012] border border-[#23252A] p-6 rounded-lg flex justify-between flex-col md:flex-row">
@@ -267,6 +280,7 @@ const ConvertForm = (): JSX.Element => {
         </label>
         <ActionButton
           type={button}
+          network={$stakeNetwork?.id}
           transactionInProgress={transactionInProgress}
           needConfirm={needConfirm}
           actionFunction={convertHandler}
