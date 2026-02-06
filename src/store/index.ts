@@ -5,11 +5,7 @@ import { QueryClient } from "@tanstack/react-query";
 
 import { deserialize, serialize } from "wagmi";
 
-import {
-  CHAINS,
-  DEFAULT_ERROR,
-  DEFAULT_TRANSACTION_SETTINGS,
-} from "@constants";
+import { DEFAULT_ERROR, DEFAULT_TRANSACTION_SETTINGS } from "@constants";
 
 import type {
   TPlatformData,
