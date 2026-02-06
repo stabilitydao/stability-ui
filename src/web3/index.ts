@@ -17,7 +17,6 @@ import ICHIABI from "./abi/ICHIABI.ts";
 import IFrontendABI from "./abi/IFrontendABI.ts";
 import IMerkleDistributor from "./abi/IMerkleDistributor.ts";
 import IRevenueRouterABI from "./abi/IRevenueRouterABI.ts";
-import IXStakingABI from "./abi/IXStakingABI.ts";
 import IXSTBLABI from "./abi/IXSTBLABI.ts";
 import IMetaVaultABI from "./abi/IMetaVaultABI.ts";
 import WrappedMetaVaultABI from "./abi/WrappedMetaVaultABI.ts";
@@ -38,7 +37,7 @@ const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
 const stabilityDAO = daos?.find(({ name }) => name === "Stability");
 
 const platforms: { [key: string]: TAddress } = Object.entries(
-  deployments
+  deployments,
 ).reduce(
   (acc, [key, value]) => {
     if (value?.core?.platform) {
@@ -46,11 +45,11 @@ const platforms: { [key: string]: TAddress } = Object.entries(
     }
     return acc;
   },
-  {} as { [key: string]: TAddress }
+  {} as { [key: string]: TAddress },
 );
 
 const priceReaders: { [key: string]: TAddress } = Object.entries(
-  deployments
+  deployments,
 ).reduce(
   (acc, [key, value]) => {
     if (value?.core?.priceReader) {
@@ -58,11 +57,11 @@ const priceReaders: { [key: string]: TAddress } = Object.entries(
     }
     return acc;
   },
-  {} as { [key: string]: TAddress }
+  {} as { [key: string]: TAddress },
 );
 
 const frontendContracts: { [key: string]: TAddress } = Object.entries(
-  deployments
+  deployments,
 ).reduce(
   (acc, [key, value]) => {
     if (value?.periphery?.frontend) {
@@ -70,11 +69,11 @@ const frontendContracts: { [key: string]: TAddress } = Object.entries(
     }
     return acc;
   },
-  {} as { [key: string]: TAddress }
+  {} as { [key: string]: TAddress },
 );
 
 const factories: { [key: string]: TAddress } = Object.entries(
-  deployments
+  deployments,
 ).reduce(
   (acc, [key, value]) => {
     if (value?.core?.factory) {
@@ -82,11 +81,11 @@ const factories: { [key: string]: TAddress } = Object.entries(
     }
     return acc;
   },
-  {} as { [key: string]: TAddress }
+  {} as { [key: string]: TAddress },
 );
 
 const stakingContracts: { [key: string]: TAddress } = Object.entries(
-  stabilityDAO?.deployments ?? {}
+  stabilityDAO?.deployments ?? {},
 ).reduce(
   (acc, [key, value]) => {
     if (value?.staking) {
@@ -94,11 +93,11 @@ const stakingContracts: { [key: string]: TAddress } = Object.entries(
     }
     return acc;
   },
-  {} as { [key: string]: TAddress }
+  {} as { [key: string]: TAddress },
 );
 
 const revenueRouters: { [key: string]: TAddress } = Object.entries(
-  stabilityDAO?.deployments ?? {}
+  stabilityDAO?.deployments ?? {},
 ).reduce(
   (acc, [key, value]) => {
     if (value?.revenueRouter) {
@@ -106,7 +105,7 @@ const revenueRouters: { [key: string]: TAddress } = Object.entries(
     }
     return acc;
   },
-  {} as { [key: string]: TAddress }
+  {} as { [key: string]: TAddress },
 );
 
 const sGEM1 = deployments[146].tokenomics.gem1;
@@ -177,7 +176,6 @@ export {
   IFrontendABI,
   IMerkleDistributor,
   IRevenueRouterABI,
-  IXStakingABI,
   IXSTBLABI,
   sGEM1,
   merkleDistributor,

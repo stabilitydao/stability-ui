@@ -26,7 +26,6 @@ import type {
   TMarketUser,
   TUserPoolData,
   TUserReservesMap,
-  TStakingData,
   TMetaVaultUser,
 } from "@types";
 
@@ -60,10 +59,6 @@ const error = atom<TError>(DEFAULT_ERROR);
 const isWeb3Load = atom<boolean>(true);
 
 const currentChainID = atom();
-
-const stakingData = atom<TStakingData | undefined>(undefined);
-
-const stakeNetwork = atom(CHAINS[1]);
 
 // deepMaps
 
@@ -136,7 +131,5 @@ export {
   userReservesData,
   userPoolsLoading,
   userReservesLoading,
-  stakingData,
   metaVaultsUsers,
-  stakeNetwork,
 };

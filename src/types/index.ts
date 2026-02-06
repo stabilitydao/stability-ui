@@ -442,11 +442,6 @@ type TUnderlyingData = {
   logo: string;
 };
 
-type TStakingData = {
-  APR: number;
-  staked: number;
-};
-
 ////          VAULT
 
 type TVaultBalance = {
@@ -695,30 +690,6 @@ type TTableActiveParams = {
   filters: number;
 };
 
-type TStakeDashboard = {
-  totalStaked: number;
-  totalStakedInUSD: number;
-  userStaked: number;
-  userStakedInUSD: number;
-  pendingRebase: number;
-  estimatedProfit: number;
-  estimatedProfitInUSD: number;
-  pendingRebaseInSTBL: number;
-  pendingRevenue: number;
-  pendingRevenueInSTBL: number;
-  timestamp: number;
-  lendingFeesXSTBL: number;
-  lendingFeesUSD: number;
-};
-
-type TVestPeriod = {
-  id: number;
-  amount: number;
-  start: number;
-  end: number;
-  isFullyExited: boolean;
-};
-
 type TMarketPrice = {
   price: string;
   priceChange: number;
@@ -859,6 +830,11 @@ type TProposal = {
 };
 
 // enums
+export enum PathTypes {
+  Route = "route",
+  External = "external",
+}
+
 export enum DisplayTypes {
   Rows = "rows",
   Grid = "grid",
@@ -879,13 +855,6 @@ export enum MetaVaultSectionTypes {
   Allocations = "allocations",
   Charts = "charts",
   Users = "users",
-}
-
-export enum DAOSectionTypes {
-  Governance = "governance",
-  InterChain = "inter-chain",
-  Tokenomics = "tokenomics",
-  Holders = "holders",
 }
 
 export enum TransactionTypes {
@@ -998,8 +967,6 @@ export type {
   TOptionInfo,
   TVSHoldModalState,
   TTableActiveParams,
-  TStakeDashboard,
-  TVestPeriod,
   TMarketPrice,
   TMarketPrices,
   TMetaVault,
@@ -1019,6 +986,5 @@ export type {
   TUserReservesMap,
   TProposal,
   TVote,
-  TStakingData,
   TMetaVaultUser,
 };

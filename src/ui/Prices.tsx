@@ -22,7 +22,7 @@ interface IProps {
 
 const getLocalStoragePrices = (
   key: string,
-  defaultValue: boolean = true
+  defaultValue: boolean = true,
 ): boolean => {
   if (typeof window === "undefined") return defaultValue;
 
@@ -42,7 +42,7 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
   const [width, setWidth] = useState(0);
 
   const [isPricesVisible, setIsPricesVisible] = useState<boolean>(() =>
-    getLocalStoragePrices("isPricesVisible", true)
+    getLocalStoragePrices("isPricesVisible", true),
   );
 
   const togglePricesVisible = () => {
@@ -56,7 +56,7 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
   useEffect(() => {
     if ($marketPrices) {
       const sortedPrices: [string, TMarketPrice][] = Object.entries(
-        $marketPrices
+        $marketPrices,
       ).sort(([a], [b]) => {
         const indexA = PRICES_ORDER.indexOf(a.toUpperCase());
         const indexB = PRICES_ORDER.indexOf(b.toUpperCase());
@@ -112,7 +112,7 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
                       data.price,
                       Number(data.price) < 1
                         ? "formatWithLongDecimalPart"
-                        : "format"
+                        : "format",
                     )}
                   </span>
                   <span
@@ -120,7 +120,7 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
                       "text-[12px] font-medium",
                       data.priceChange >= 0
                         ? "text-[#48C05C]"
-                        : "text-[#DE4343]"
+                        : "text-[#DE4343]",
                     )}
                   >
                     {data.priceChange > 0 ? "+" : ""}
@@ -139,7 +139,9 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
     <div
       className={cn(
         "flex flex-col gap-3 w-full text-white border border-[#232429] rounded-lg cursor-pointer",
-        isPricesVisible ? "p-4" : "h-10 px-4 items-center justify-center w-full"
+        isPricesVisible
+          ? "p-4"
+          : "h-10 px-4 items-center justify-center w-full",
       )}
       onClick={togglePricesVisible}
     >
@@ -174,7 +176,7 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
                         data.price,
                         Number(data.price) < 1
                           ? "formatWithLongDecimalPart"
-                          : "format"
+                          : "format",
                       )}
                     </span>
                     <span
@@ -182,7 +184,7 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
                         "w-[50px] text-end",
                         data.priceChange >= 0
                           ? "text-[#48C05C]"
-                          : "text-[#DE4343]"
+                          : "text-[#DE4343]",
                       )}
                     >
                       {data.priceChange > 0 ? "+" : ""}
@@ -191,7 +193,7 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
                   </div>
                 </div>
               ))
-            : [1, 2, 3, 4, 5].map((key) => (
+            : PRICES_ORDER.map((key) => (
                 <div
                   className="flex items-center justify-between"
                   key={`skeleton-${key}`}

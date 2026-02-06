@@ -66,17 +66,11 @@ import {
   loadMarketsData,
 } from "@utils";
 
-import {
-  // YEARN_PROTOCOLS,
-  STRATEGY_SPECIFIC_SUBSTITUTE,
-  CHAINS,
-  // BIG_INT_VALUES,
-} from "@constants";
+import { STRATEGY_SPECIFIC_SUBSTITUTE, CHAINS } from "@constants";
 
 import type {
   TAddress,
   THoldData,
-  // TYearnProtocol,
   TVaults,
   TMultichainPrices,
   TPriceInfo,
@@ -88,7 +82,6 @@ import type {
   TMetaVault,
   TMarketPrices,
   TMarket,
-  // TAsset,
 } from "@types";
 
 import type {
@@ -160,7 +153,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             console.log("API Error:", err);
             console.log(
               `Retrying (${currentRetry + 1}/${maxRetries})...`,
-              seed
+              seed,
             );
           }
         }
@@ -182,7 +175,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const setVaultsData = async (
     data: any,
     prices: { [key: string]: TPriceInfo },
-    chainID: string
+    chainID: string,
   ) => {
     const APIVaults = await data.reduce(
       async (vaultsPromise: Promise<Vaults>, vault: Vault) => {
@@ -203,16 +196,10 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           vault.strategyId,
           vault.strategyShortId as StrategyShortId,
           strategySpecific as string,
-          vault.assets as TAddress[]
+          vault.assets as TAddress[],
         );
 
-        // const strategyName = strategyInfo?.shortId;
-
         const NOW = Math.floor(Date.now() / 1000);
-
-        // const almRebalanceEntity = vault?.almRebalanceRawData?.[0]?.map(
-        //   (_: string) => BigInt(_)
-        // );
 
         let dailyAPR = 0;
         let rebalances = {};
@@ -223,30 +210,30 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
         ///////
         const decimals = vault?.assets?.map(
-          (asset: string) => getTokenData(asset)?.decimals
+          (asset: string) => getTokenData(asset)?.decimals,
         );
 
         const assetsAmounts = vault?.assetsAmounts?.map(
           (amount: string, index: number) =>
-            formatUnits(BigInt(amount), decimals?.[index] || 18)
+            formatUnits(BigInt(amount), decimals?.[index] || 18),
         );
         const assetsPrices = vault?.assets?.map(
-          (asset: string) => prices?.[asset?.toLowerCase()]?.price
+          (asset: string) => prices?.[asset?.toLowerCase()]?.price,
         );
 
         const assetsAmountsInUSD = assetsAmounts?.map(
           (amount: string, index: number) =>
-            Number(amount) * Number(assetsPrices?.[index])
+            Number(amount) * Number(assetsPrices?.[index]),
         );
 
         const assetsAmountsSum = assetsAmountsInUSD?.reduce(
           (acc: number, cur: number) => acc + cur,
-          0
+          0,
         );
 
         const assetsProportions = assetsAmountsSum
           ? assetsAmountsInUSD?.map((amount: string | number) =>
-              Math.round((Number(amount) / assetsAmountsSum) * 100)
+              Math.round((Number(amount) / assetsAmountsSum) * 100),
             )
           : assetsAmountsInUSD?.map((_: number) => 50);
 
@@ -267,7 +254,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
         ///// APR DATA CALCULATION
         const daysFromLastHardWork = getTimeDifference(
-          vault.lastHardWork as number
+          vault.lastHardWork as number,
         )?.days;
 
         let poolSwapFeesAPRDaily = 0;
@@ -325,45 +312,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               underlying?.apr?.weekly || underlying?.apr?.monthly || 0;
           }
 
-          // if (strategyName === "IQMF" || strategyName === "IRMF") {
-          //   //////
-          //   poolSwapFeesAPRDaily =
-          //     Number(
-          //       formatUnits(almRebalanceEntity?.[0] || BIG_INT_VALUES.ZERO, 8)
-          //     ) -
-          //     (Number(
-          //       formatUnits(almRebalanceEntity?.[0] || BIG_INT_VALUES.ZERO, 8)
-          //     ) /
-          //       100) *
-          //       fee;
-
-          //   poolSwapFeesAPRWeekly =
-          //     Number(
-          //       formatUnits(almRebalanceEntity?.[2] || BIG_INT_VALUES.ZERO, 8)
-          //     ) -
-          //     (Number(
-          //       formatUnits(almRebalanceEntity?.[2] || BIG_INT_VALUES.ZERO, 8)
-          //     ) /
-          //       100) *
-          //       fee;
-
-          //   dailyAPR =
-          //     Number(
-          //       formatUnits(almRebalanceEntity?.[1] || BIG_INT_VALUES.ZERO, 8)
-          //     ) -
-          //     (Number(
-          //       formatUnits(almRebalanceEntity?.[1] || BIG_INT_VALUES.ZERO, 8)
-          //     ) /
-          //       100) *
-          //       fee;
-
-          //   if (!poolSwapFeesAPRDaily) poolSwapFeesAPRDaily = 0;
-          //   if (!poolSwapFeesAPRWeekly) poolSwapFeesAPRWeekly = 0;
-          //   if (!dailyAPR) dailyAPR = 0;
-          // }
-
           APR = (Number(vault?.income?.aprLatest) + Number(dailyAPR)).toFixed(
-            2
+            2,
           );
 
           APRWithoutFees = Number(vault?.income?.aprLatest).toFixed(2) || "0";
@@ -383,7 +333,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                     vault?.income?.apr24h,
                     dailyTotalAPRWithFees,
                     APR,
-                    vault.strategyShortId
+                    vault.strategyShortId,
                   ),
             weekly:
               Number(weeklyTotalAPRWithFees) < 0
@@ -392,32 +342,32 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                     vault?.income?.aprWeek,
                     weeklyTotalAPRWithFees,
                     APR,
-                    vault.strategyShortId
+                    vault.strategyShortId,
                   ),
           };
 
           gemsAPR = {
             latest: String(
               Number(APRArray.latest) *
-                Number(stabilityAPIData?.rewards?.gemsAprMultiplier)
+                Number(stabilityAPIData?.rewards?.gemsAprMultiplier),
             ),
             daily: String(
               Number(APRArray.daily) *
-                Number(stabilityAPIData?.rewards?.gemsAprMultiplier)
+                Number(stabilityAPIData?.rewards?.gemsAprMultiplier),
             ),
             weekly: String(
               Number(APRArray.weekly) *
-                Number(stabilityAPIData?.rewards?.gemsAprMultiplier)
+                Number(stabilityAPIData?.rewards?.gemsAprMultiplier),
             ),
           };
 
           totalAPRArray = {
             latest: (Number(APRArray.latest) + Number(gemsAPR.latest)).toFixed(
-              2
+              2,
             ),
             daily: (Number(APRArray.daily) + Number(gemsAPR.daily)).toFixed(2),
             weekly: (Number(APRArray.weekly) + Number(gemsAPR.weekly)).toFixed(
-              2
+              2,
             ),
           };
 
@@ -432,7 +382,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                     vault?.income?.apr24h,
                     calculateAPY(totalAPRArray.daily).toFixed(2),
                     APY,
-                    vault.strategyShortId
+                    vault.strategyShortId,
                   ),
             weekly:
               Number(totalAPRArray.weekly) < 0
@@ -441,7 +391,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                     vault?.income?.aprWeek,
                     calculateAPY(Number(totalAPRArray.weekly)).toFixed(2),
                     APY,
-                    vault.strategyShortId
+                    vault.strategyShortId,
                   ),
           };
 
@@ -450,14 +400,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
             weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
           };
-
-          // strategyName != "CF"
-          //   ? {
-          //       latest: Number(dailyAPR).toFixed(2),
-          //       daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
-          //       weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
-          //     }
-          //   : { latest: "-", daily: "-", weekly: "-" };
 
           farmAPR = {
             latest: Number(APRWithoutFees) < 0 ? "0" : APRWithoutFees,
@@ -468,7 +410,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                     vault?.income?.apr24h,
                     dailyFarmApr,
                     APRWithoutFees,
-                    vault.strategyShortId
+                    vault.strategyShortId,
                   ),
             weekly:
               Number(weeklyFarmApr) < 0
@@ -477,7 +419,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                     vault?.income?.aprWeek,
                     weeklyFarmApr,
                     APRWithoutFees,
-                    vault.strategyShortId
+                    vault.strategyShortId,
                   ),
           };
         }
@@ -486,10 +428,10 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         const totalRebalances = vault.almRebalanceRawData || [];
 
         const _24HRebalances = totalRebalances.filter(
-          (obj: string[]) => Number(obj[3]) >= NOW - 86400
+          (obj: string[]) => Number(obj[3]) >= NOW - 86400,
         ).length;
         const _7DRebalances = totalRebalances.filter(
-          (obj: string[]) => Number(obj[3]) >= NOW - 86400 * 7
+          (obj: string[]) => Number(obj[3]) >= NOW - 86400 * 7,
         ).length;
 
         rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
@@ -542,8 +484,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             const priceOnCreation = Number(
               formatUnits(
                 BigInt(vault?.assetsPricesOnCreation?.[index] ?? 1),
-                18
-              )
+                18,
+              ),
             );
 
             const priceDifference =
@@ -555,16 +497,16 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               price: price.toFixed(2),
               priceDifference: priceDifference.toFixed(2),
               dailyAPR: Number(vault.vsHold?.aprAssets24h[index] ?? 0).toFixed(
-                2
+                2,
               ),
               weeklyAPR: Number(
-                vault.vsHold?.aprAssetsWeek[index] ?? 0
+                vault.vsHold?.aprAssetsWeek[index] ?? 0,
               ).toFixed(2),
               latestAPR: Number(
-                vault.vsHold?.lifetimeAssets[index] ?? 0
+                vault.vsHold?.lifetimeAssets[index] ?? 0,
               ).toFixed(2),
               APR: Number(vault.vsHold?.aprAssetsLifetime[index] ?? 0).toFixed(
-                2
+                2,
               ),
             };
           });
@@ -572,55 +514,11 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
         const isVsActive = daysFromCreation >= 10 && !!Number(vault.sharePrice);
 
-        /////***** YEARN PROTOCOLS *****/////
-        // let yearnProtocols: TYearnProtocol[] = [];
-
-        // if (vault.strategySpecific && strategyInfo?.shortId === "Y") {
-        //   YEARN_PROTOCOLS.map((protocol: string) => {
-        //     if (vault?.strategySpecific?.toLowerCase().includes(protocol)) {
-        //       switch (protocol) {
-        //         case "aave":
-        //           yearnProtocols.push({
-        //             title: "Aave",
-        //             link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Aave.png",
-        //           });
-        //           break;
-        //         case "compound":
-        //           yearnProtocols.push({
-        //             title: "Compound",
-        //             link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Compound.png",
-        //           });
-        //           break;
-        //         case "stargate":
-        //           yearnProtocols.push({
-        //             title: "Stargate",
-        //             link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Stargate.svg",
-        //           });
-        //           break;
-        //         case "stmatic":
-        //           yearnProtocols.push({
-        //             title: "Lido",
-        //             link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Lido.svg",
-        //           });
-        //           break;
-        //         default:
-        //           break;
-        //       }
-        //     }
-        //   });
-        // }
-
         if (STRATEGY_SPECIFIC_SUBSTITUTE[vault.address.toLowerCase()]) {
           strategySpecific =
             STRATEGY_SPECIFIC_SUBSTITUTE[vault.address.toLowerCase()];
         } else {
           strategySpecific = vault?.strategySpecific as string;
-          // strategyInfo?.shortId === "DQMF"
-          //   ? (vault?.strategySpecific?.replace(
-          //       /\s*0x[a-fA-F0-9]+\.\.[a-fA-F0-9]+\s*/,
-          //       ""
-          //     ) as string)
-          //   : (vault?.strategySpecific as string);
         }
         /////
         const assetsSymbol = assets.map((asset) => asset?.symbol).join("+");
@@ -632,7 +530,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           : vault.sharePriceLast;
 
         const strategyProtocols = getStrategyProtocols(
-          strategyInfo.shortId as StrategyShortId
+          strategyInfo.shortId as StrategyShortId,
         );
 
         const underlyingLogo = strategyProtocols.length
@@ -670,7 +568,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             break;
           default:
             const scProportionIndex = assets.findIndex((asset) =>
-              ["scETH", "scUSD"].includes(asset?.symbol as string)
+              ["scETH", "scUSD"].includes(asset?.symbol as string),
             );
 
             let points = strategyAssets.reduce((acc, asset, index) => {
@@ -776,7 +674,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
         return vaults;
       },
-      Promise.resolve({})
+      Promise.resolve({}),
     );
 
     localVaults[chainID] = APIVaults;
@@ -792,7 +690,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
     /***** MARKETS *****/
     localMarkets = await loadMarketsData(
-      stabilityAPIData.markets as MarketData
+      stabilityAPIData.markets as MarketData,
     );
 
     markets.set(localMarkets);
@@ -823,7 +721,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         if (!chain) return;
         /////***** SET VAULTS DATA *****/////
         const APIVaultsData = Object.values(
-          stabilityAPIData?.vaults?.[chain.id] as Vaults
+          stabilityAPIData?.vaults?.[chain.id] as Vaults,
         );
 
         /////***** SET PLATFORM DATA *****/////
@@ -859,7 +757,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                   frontendContracts[chain.id],
                   "getBalanceAssets",
                   address as TAddress,
-                  0
+                  0,
                 );
 
               const contractVaultsBalances =
@@ -868,7 +766,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                   frontendContracts[chain.id],
                   "getBalanceVaults",
                   address as TAddress,
-                  0
+                  0,
                 );
 
               if (
@@ -882,16 +780,16 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 //function -> .set vault/
 
                 vaultsData[chain.id] = addVaultData(
-                  contractVaultsBalances as TFrontendBalances
+                  contractVaultsBalances as TFrontendBalances,
                 );
 
                 assetBalances[chain.id] = addAssetsBalance(
-                  contractAssetsBalances as TFrontendBalances
+                  contractAssetsBalances as TFrontendBalances,
                 );
 
                 for (let i = 0; i < contractAssetsBalances[1].length; i++) {
                   erc20Balance[String(contractAssetsBalances[1][i])] = BigInt(
-                    contractAssetsBalances[3][i]
+                    contractAssetsBalances[3][i],
                   );
                 }
 
@@ -907,7 +805,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                         if (vaultData && balance !== undefined) {
                           const sharePrice = Number(vaultData.shareprice ?? 0);
                           const formattedBalance = Number(
-                            formatUnits(BigInt(balance), 18)
+                            formatUnits(BigInt(balance), 18),
                           );
                           const balanceInUSD = formattedBalance * sharePrice;
 
@@ -921,15 +819,15 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                         }
 
                         return null;
-                      }
-                    )
+                      },
+                    ),
                   );
 
                   localVaults[chain.id] = vaultsPromise
                     .filter(Boolean)
                     .reduce(
                       (acc, curr) => ({ ...acc, ...curr }),
-                      {}
+                      {},
                     ) as TVaults;
                 }
               }
@@ -946,7 +844,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
           isVaultsLoaded.set(true);
         }
-      })
+      }),
     );
 
     /***** META VAULTS *****/
@@ -957,18 +855,18 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           if (!chain) return;
           /////***** SET VAULTS DATA *****/////
           const APIMetaVaultsData = Object.values(
-            stabilityAPIData?.metaVaults?.[chain.id] as Vaults
+            stabilityAPIData?.metaVaults?.[chain.id] as Vaults,
           ).filter(
             ({ address }) =>
               address?.toLowerCase() !=
-              "0x11111527df7335772e6e94cf464473f19e421111"
+              "0x11111527df7335772e6e94cf464473f19e421111",
           );
           // temp: remove after meta vault statuses update
 
           if (APIMetaVaultsData.length) {
             const _metaVaults = APIMetaVaultsData.map((metaVault) => {
               const isSMetaVault = ["metaS", "metawS"].includes(
-                metaVault?.symbol
+                metaVault?.symbol,
               );
 
               let merklAPR = 0;
@@ -1024,7 +922,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 const balances = await Promise.all(
                   localMetaVaults[chain.id].map(async (mv) => {
                     const isSMetaVault = ["metaS", "metawS"].includes(
-                      mv?.symbol
+                      mv?.symbol,
                     );
 
                     let balanceInUSD = 0;
@@ -1037,7 +935,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                     })) as bigint;
 
                     const formattedBalance = Number(
-                      formatUnits(BigInt(metaVaultBalance), 18)
+                      formatUnits(BigInt(metaVaultBalance), 18),
                     );
 
                     const price = isSMetaVault
@@ -1051,7 +949,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                       balance: metaVaultBalance,
                       balanceInUSD,
                     };
-                  })
+                  }),
                 );
 
                 localMetaVaults[chain.id] = balances;
@@ -1066,8 +964,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               }
             }
           }
-        }
-      )
+        },
+      ),
     );
 
     isWeb3Load.set(false);
@@ -1109,7 +1007,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           ...metaV,
           name: getTokenData(metaV.address)?.name,
           network: "146",
-        })
+        }),
       );
 
       const plasmaMetaVaultsWithName = deployments["9745"].metaVaults?.map(
@@ -1117,7 +1015,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           ...metaV,
           name: getTokenData(metaV.address)?.name,
           network: "9745",
-        })
+        }),
       );
 
       metaVaults.set({
