@@ -17,7 +17,6 @@ import { Strategy } from "./Platform/components/Strategies/Strategy";
 import { Swapper } from "./Platform/components/Swapper";
 import { Contests } from "./Contests";
 import { Contest } from "./Contests/Contest";
-import { Staking } from "./Staking";
 import { Dashboard } from "./Dashboard";
 import { LeverageVaults } from "./LeverageVaults";
 import { Metavaults } from "./Metavaults";
@@ -27,7 +26,6 @@ import { Lending } from "./Lending";
 import { MetavaultsManagement } from "./Factory/MetavaultsManagement";
 import { Market } from "./Market";
 import { StabilityBuilder, StabilityOperator } from "./Platform";
-import { DAO } from "./DAO";
 
 import { Season1, Season2 } from "./Seasons";
 import { RecoveryDashboard } from "./RecoveryDashboard";
@@ -50,7 +48,6 @@ export {
   Contests,
   Contest,
   Home,
-  Staking,
   Swapper,
   Dashboard,
   LeverageVaults,
@@ -62,7 +59,6 @@ export {
   Market,
   StabilityBuilder,
   StabilityOperator,
-  DAO,
   Season1,
   Season2,
   LeverageVault,

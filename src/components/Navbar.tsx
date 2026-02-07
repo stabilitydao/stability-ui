@@ -4,21 +4,19 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useStore } from "@nanostores/react";
 
-import { Prices, NavIcon, Socials, TextSkeleton, Badge, APRBadge } from "@ui";
+import { Prices, NavIcon, Socials, TextSkeleton } from "@ui";
 
-import { cn, formatNumber, useProposals, useStakingData } from "@utils";
+import { cn, formatNumber } from "@utils";
 
 import { apiData, isNavbar } from "@store";
 
 import { PATHS, ROUTES } from "@constants";
 
+import { PathTypes } from "@types";
+
 const Navbar = (): JSX.Element => {
   const pathname = window.location.pathname;
   const currentPath = pathname.slice(1);
-
-  const { isVoting } = useProposals();
-
-  const { data: stakingData } = useStakingData();
 
   const $apiData = useStore(apiData);
 
@@ -59,10 +57,10 @@ const Navbar = (): JSX.Element => {
         ? formatNumber(
             Number($apiData?.total.tvl ?? 0) +
               Number($apiData?.total?.marketTvl ?? 0),
-            "abbreviate"
+            "abbreviate",
           )
         : "0",
-    [$apiData]
+    [$apiData],
   );
 
   const statusColor =
@@ -99,33 +97,40 @@ const Navbar = (): JSX.Element => {
               </a>
 
               <div className="mt-4">
-                {PATHS.map(({ name, path }) => (
+                {PATHS.map(({ name, path, type }) => (
                   <div
                     key={name}
                     className={cn(
                       "cursor-pointer rounded-lg",
-                      activePath === path && "bg-[#22242a]"
+                      activePath === path && "bg-[#22242a]",
                     )}
                   >
                     <a
                       className="px-4 py-3 flex items-center justify-between"
-                      href={`/${path}`}
+                      href={type === PathTypes.Route ? `/${path}` : path}
+                      target={
+                        type === PathTypes.External ? "_blank" : undefined
+                      }
                     >
-                      <span
-                        className={cn(
-                          "text-[#97979A]",
-                          activePath === path && "text-white"
-                        )}
-                      >
-                        {name}
-                      </span>
+                      <div className="flex items-center gap-1">
+                        <span
+                          className={cn(
+                            "text-[#97979A]",
+                            activePath === path && "text-white",
+                          )}
+                        >
+                          {name}
+                        </span>
+                        {type === PathTypes.External ? (
+                          <img
+                            src="/icons/purple_link.png"
+                            alt="external link"
+                            className="w-3 h-3 cursor-pointer"
+                          />
+                        ) : null}
+                      </div>
+
                       <div className="flex items-center gap-3">
-                        {path === "staking" && (
-                          <APRBadge APR={stakingData?.APR ?? 0} />
-                        )}
-                        {path === "dao" && isVoting && (
-                          <Badge state="success" text="Voting" greater />
-                        )}
                         <NavIcon path={path} isActive={activePath === path} />
                       </div>
                     </a>
@@ -162,12 +167,6 @@ const Navbar = (): JSX.Element => {
                 </a>
               </div>
               <div className="text-[#97979A] flex flex-col">
-                {/* <a href="#" className="px-4 py-2">
-                  Privacy Policy
-                </a>
-                <a href="#" className="px-4 py-2">
-                  Terms of Use
-                </a> */}
                 <Socials styles="pb-0" />
               </div>
             </div>

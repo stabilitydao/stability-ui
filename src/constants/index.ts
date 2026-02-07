@@ -48,7 +48,7 @@ import {
 
 import { VAULTS_META_TITLES } from "./meta";
 
-import { IProtocol } from "@types";
+import { IProtocol, PathTypes } from "@types";
 
 const APRsType = ["latest", "24h", "week"];
 
@@ -239,7 +239,7 @@ const PROTOCOLS = Object.entries(integrations).reduce<
   addProtocol(integrationKey, integration, integration.img);
 
   Object.entries(integration.protocols ?? {}).forEach(([key, val]) =>
-    addProtocol(key, val, integration.img)
+    addProtocol(key, val, integration.img),
   );
 
   return acc;
@@ -321,19 +321,15 @@ const META_VAULTS_EXCEPTIONS = [
 ];
 
 const PATHS = [
-  { name: "Lending", path: "lending" },
-  { name: "Meta Vaults", path: "metavaults" },
-  { name: "Leverage Vaults", path: "leverage-vaults" },
-  { name: "All Vaults", path: "vaults" },
-  { name: "Staking", path: "staking" },
-  { name: "DAO", path: "dao" },
-  // { name: "ALM", path: "alm" },
-  // { name: "Dashboard", path: "dashboard" },
-  // { name: "Agents", path: "agents" },
+  { name: "Lending", path: "lending", type: PathTypes.Route },
+  { name: "Meta Vaults", path: "metavaults", type: PathTypes.Route },
+  { name: "Leverage Vaults", path: "leverage-vaults", type: PathTypes.Route },
+  { name: "All Vaults", path: "vaults", type: PathTypes.Route },
+  { name: "DAO", path: "https://dao.host/stbl", type: PathTypes.External },
 ];
 
 const ROUTES = {
-  basic: ["staking", "dashboard", "alm", "agents", "lending", "dao"],
+  basic: ["dashboard", "alm", "agents", "lending", "dao"],
   platform: [
     "platform",
     "strategies",
@@ -355,54 +351,8 @@ const LENDING_MARKETS = {
       link: "/lending/146/wmetaUSD-gen2",
       isBlank: false,
     },
-    // {
-    //   logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png`,
-    //   symbol: "Silo wmetaUSD - USDC",
-    //   link: "https://v2.silo.finance/markets/sonic/wmetausd-usdc-121?action=deposit",
-    // },
-    // {
-    //   logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png`,
-    //   symbol: "Silo wmetaUSD - scUSD",
-    //   link: "https://v2.silo.finance/markets/sonic/wmetausd-scusd-125?action=deposit",
-    // },
-    // {
-    //   logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/enclabs.svg`,
-    //   symbol: "Enclabs wmetaUSD",
-    //   link: "https://www.enclabs.finance/#/core-pool/market/0x1D801dC616C79c499C5d38c998Ef2D0D6Cf868e8?chainId=146",
-    // },
-    // {
-    //   logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
-    //   symbol: "Euler wmetaUSD",
-    //   link: "https://app.euler.finance/vault/0x6F11663766bB213003cD74EB09ff4c67145023c5?network=sonic",
-    // },
-    // {
-    //   logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
-    //   symbol: "Euler wmetaUSD - USDC (looper)",
-    //   link: "https://app.euler.finance/positions/0x6F11663766bB213003cD74EB09ff4c67145023c5/0x196F3C7443E940911EE2Bb88e019Fd71400349D9?network=sonic&tab=multiply",
-    // },
   ],
-  // "0x4444444420d9de54d69b3997b7d6a31d2bf63f32": [
-  //   {
-  //     logo: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png",
-  //     symbol: "Silo wmetaS - S",
-  //     link: "https://v2.silo.finance/markets/sonic/wmetas-s-128?action=deposit",
-  //   },
-  //   {
-  //     logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
-  //     symbol: "Euler wmetaS",
-  //     link: "https://app.euler.finance/vault/0xC37fa1c70D77bdEd373C551a92bAbcee44a9d04E?network=sonic",
-  //   },
-  //   {
-  //     logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
-  //     symbol: "Euler wmetaS - wS (looper)",
-  //     link: "https://app.euler.finance/positions/0xC37fa1c70D77bdEd373C551a92bAbcee44a9d04E/0x9144C0F0614dD0acE859C61CC37e5386d2Ada43A?network=sonic&tab=multiply",
-  //   },
-  // ],
 };
-
-const SPACE_ID = "stabilitydao.eth";
-
-const SNAPSHOT_API = "https://hub.snapshot.org/graphql";
 
 const SOCIALS = [
   {
@@ -432,7 +382,7 @@ const SOCIALS = [
   },
 ];
 
-const PRICES_ORDER = ["STBL", "BTC", "ETH", "AVAX", "S"];
+const PRICES_ORDER = ["STBL", "BTC", "ETH", "S", "XPL"];
 
 export {
   APRsType,
@@ -494,8 +444,6 @@ export {
   META_VAULTS_EXCEPTIONS,
   HOLDERS_TABLE,
   MARKETS_TABLE_FILTERS,
-  SPACE_ID,
-  SNAPSHOT_API,
   METAVAULT_USERS_TABLE,
   ETHENA_POINTS,
   ETHERFI_POINTS,

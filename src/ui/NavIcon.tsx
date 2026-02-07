@@ -4,7 +4,6 @@ import {
   LeverageIcon,
   MetavaultsIcon,
   ALMIcon,
-  StakingIcon,
   AgentsIcon,
   PlatformIcon,
   LendingIcon,
@@ -29,15 +28,13 @@ const NavIcon: React.FC<IProps> = ({ path, isActive }) => {
       return <MetavaultsIcon color={color} />;
     case "alm":
       return <ALMIcon color={color} />;
-    case "staking":
-      return <StakingIcon color={color} />;
     case "agents":
       return <AgentsIcon color={color} />;
     case "platform":
       return <PlatformIcon color={color} />;
     case "lending":
       return <LendingIcon color={color} />;
-    case "dao":
+    case "https://dao.host/stbl":
       return <DAOIcon color={color} />;
     default:
       return null;

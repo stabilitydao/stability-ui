@@ -3,7 +3,6 @@ import { VaultsIcon } from "./Vaults";
 import { LeverageIcon } from "./Leverage";
 import { MetavaultsIcon } from "./Metavaults";
 import { ALMIcon } from "./ALM";
-import { StakingIcon } from "./Staking";
 import { AgentsIcon } from "./Agents";
 import { PlatformIcon } from "./Platform";
 import { RowsIcon } from "./Rows";
@@ -21,7 +20,6 @@ export {
   LeverageIcon,
   MetavaultsIcon,
   ALMIcon,
-  StakingIcon,
   AgentsIcon,
   PlatformIcon,
   RowsIcon,

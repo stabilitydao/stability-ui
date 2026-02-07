@@ -4,21 +4,19 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useStore } from "@nanostores/react";
 
-import { Prices, NavIcon, Socials, Badge, APRBadge } from "@ui";
+import { Prices, NavIcon, Socials } from "@ui";
 
-import { cn, formatNumber, useProposals, useStakingData } from "@utils";
+import { cn, formatNumber } from "@utils";
 
 import { apiData, isNavbar } from "@store";
 
 import { PATHS, ROUTES } from "@constants";
 
+import { PathTypes } from "@types";
+
 const Menu = (): JSX.Element => {
   const pathname = window.location.pathname;
   const currentPath = pathname.slice(1);
-
-  const { isVoting } = useProposals();
-
-  const { data: stakingData } = useStakingData();
 
   const $isNavbar = useStore(isNavbar);
   const $apiData = useStore(apiData);
@@ -58,10 +56,10 @@ const Menu = (): JSX.Element => {
         ? formatNumber(
             Number($apiData?.total.tvl ?? 0) +
               Number($apiData?.total?.marketTvl ?? 0),
-            "abbreviate"
+            "abbreviate",
           )
         : "0",
-    [$apiData]
+    [$apiData],
   );
 
   const isAlert = $apiData?.network?.status == "Alert";
@@ -102,33 +100,40 @@ const Menu = (): JSX.Element => {
               </div>
 
               <div className="flex flex-col gap-2 max-h-[48vh] overflow-y-auto">
-                {PATHS.map(({ name, path }) => (
+                {PATHS.map(({ name, path, type }) => (
                   <div
                     key={name}
                     className={cn(
                       "cursor-pointer rounded-lg bg-[#22242a] border border-[#35363B]",
-                      activePath === path && "border-[#816FEA]"
+                      activePath === path && "border-[#816FEA]",
                     )}
                   >
                     <a
                       className="px-4 py-3 flex items-center justify-between"
-                      href={`/${path}`}
+                      href={type === PathTypes.Route ? `/${path}` : path}
+                      target={
+                        type === PathTypes.External ? "_blank" : undefined
+                      }
                     >
-                      <span
-                        className={cn(
-                          "text-[#97979A] text-[16px] leading-4 font-medium",
-                          activePath === path && "text-white"
-                        )}
-                      >
-                        {name}
-                      </span>
+                      <div className="flex items-center gap-1">
+                        {" "}
+                        <span
+                          className={cn(
+                            "text-[#97979A] text-[16px] leading-4 font-medium",
+                            activePath === path && "text-white",
+                          )}
+                        >
+                          {name}
+                        </span>
+                        {type === PathTypes.External ? (
+                          <img
+                            src="/icons/purple_link.png"
+                            alt="external link"
+                            className="w-3 h-3 cursor-pointer"
+                          />
+                        ) : null}
+                      </div>
                       <div className="flex items-center gap-3">
-                        {path === "dao" && isVoting && (
-                          <Badge state="success" text="Voting" greater />
-                        )}
-                        {path === "staking" && (
-                          <APRBadge APR={stakingData?.APR ?? 0} />
-                        )}
                         <NavIcon path={path} isActive={activePath === path} />
                       </div>
                     </a>
